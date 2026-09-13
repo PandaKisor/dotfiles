@@ -9,6 +9,7 @@ dunst
 fastfetch
 fish
 flameshot
+ffmpeg
 keepassxc
 mpv
 pavucontrol
@@ -19,5 +20,6 @@ thunar
 ttf-hack
 xorg-xrandr
 
-# Optional live wallpaper support also needs xwinwrap, which is not currently
-# installed and may need to come from the AUR.
+# AUR packages used by the desktop (install with paru, not pacman):
+# python-pywal16-git
+# xwinwrap-git

@@ -35,12 +35,24 @@ copy `profiles/local-startup.sh.example` to `~/.config/i3/local-startup.sh` for
 the physical display and wallpaper commands. Both destinations are ignored by
 Git so a work machine can use different values.
 
-## Auto-tiling
+## Auto-tiling and wallpaper colors
 
-The default mode is `alternating`, provided by the CachyOS/Arch `autotiling`
-package. Other accepted values in `~/.config/i3/autotiling-mode` are
-`quadrant` (the existing custom 2x2-oriented helper) and `off`. Only one helper
-runs at a time.
+The i3 config runs the CachyOS/Arch `autotiling` package directly. The old
+`quadrant-tiling.py` remains for reference but is not started; never run both
+helpers together.
+
+`live-wallpaper.sh` asks `video-theme.sh` to extract a frame at 12 seconds,
+scales it down for quick palette analysis, and runs Pywal16 without replacing
+the animated wallpaper. Generated colors are consumed by i3, Polybar, Rofi,
+Dunst, and new Fish/Alacritty terminals. Override the frame time with
+`PYWAL_VIDEO_SEEK`, for example `PYWAL_VIDEO_SEEK=00:00:30`.
+
+Install the two missing components on CachyOS with:
+
+```bash
+sudo pacman -S --needed autotiling
+paru -S --needed python-pywal16-git
+```
 
 Install dependencies on CachyOS with the reviewed package names in
 `packages/cachyos.txt`. Package installation is intentionally not automatic.
@@ -51,7 +63,7 @@ Before adding a remote:
 
 1. Run `./scripts/check.sh`.
 2. Review `git diff` and `git status --ignored`.
-3. Rotate the weather API key called out in the review notes.
+3. Rotate the old weather API key and use the ignored `weather.env` file.
 4. Confirm your workplace permits each configuration and script.
 
 No GitHub remote is configured by this repository.

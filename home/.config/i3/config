@@ -101,13 +101,25 @@ exec_always --no-startup-id ~/.config/polybar/launch.sh
 # Window colors / borders
 ########################################################################
 
+# Static defaults keep i3 usable before Pywal has generated its cache. The
+# optional include replaces these variables after video-theme.sh runs.
+set $wal_background     #0B1118
+set $wal_background_alt #101A24
+set $wal_foreground     #D8DEE9
+set $wal_foreground_alt #9AA7B2
+set $wal_muted          #4C566A
+set $wal_accent         #88C0D0
+set $wal_accent_alt     #00D1FF
+set $wal_alert          #BF616A
+include ~/.cache/wal/colors-i3.conf
+
 # class                 border  backgr. text    indicator child_border
-client.focused          #0B1118 #0B1118 #D8DEE9 #88C0D0   #88C0D0
-client.focused_inactive #0B1118 #0B1118 #9AA7B2 #0B1118   #0B1118
-client.unfocused        #0B1118 #0B1118 #4C566A #0B1118   #0B1118
-client.urgent           #BF616A #BF616A #0B1118 #BF616A   #BF616A
-client.placeholder      #0B1118 #0B1118 #D8DEE9 #0B1118   #0B1118
-client.background       #0B1118
+client.focused          $wal_background $wal_background $wal_foreground     $wal_accent     $wal_accent
+client.focused_inactive $wal_background $wal_background $wal_foreground_alt $wal_background $wal_background
+client.unfocused        $wal_background $wal_background $wal_muted          $wal_background $wal_background
+client.urgent           $wal_alert      $wal_alert      $wal_background     $wal_alert      $wal_alert
+client.placeholder      $wal_background $wal_background $wal_foreground     $wal_background $wal_background
+client.background       $wal_background
 
 ########################################################################
 # Floating rules
@@ -163,9 +175,9 @@ bindsym $mod+l exec "sleep 0.1 && i3lock --blur 5"
 # Autoload
 ########################################################################
 
-# Auto-tiling mode comes from ~/.config/i3/autotiling-mode.
-# Supported values: alternating (default), quadrant, off.
-exec_always --no-startup-id ~/.config/i3/autotiling.sh
+# Standard automatic split selection. Do not run this together with the old
+# quadrant-tiling.py helper; both react to the same i3 window events.
+exec_always --no-startup-id autotiling
 
 # Monitor layout and machine-local wallpaper commands belong in this untracked
 # hook. Start from the example in the dotfiles repository when needed.
@@ -175,8 +187,11 @@ exec --no-startup-id sh -c 'test -x "$HOME/.config/i3/local-startup.sh" && exec 
 # Startup services using packages you already have.
 exec --no-startup-id dunst
 exec --no-startup-id ~/.config/i3/start-picom.sh
-exec --no-startup-id tumblerd
 exec --no-startup-id copyq --start-server
+
+# Generates a Pywal palette from one MP4 frame, then starts the animation.
+# This uses exec (not exec_always) so its i3 reload cannot create a loop.
+exec --no-startup-id ~/.config/i3/live-wallpaper.sh
 
 # nm-applet requires a system tray. Polybar is intentionally tray-free now,
 # so this is disabled to avoid hidden background tray clutter.

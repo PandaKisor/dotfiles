@@ -1,0 +1,13 @@
+* {{
+    bg: {background};
+    bg-alt: {color0};
+    bg-soft: {color8};
+    fg: {foreground};
+    muted: {color7};
+    faint: {color8};
+    accent: {color4};
+    accent-2: {color6};
+    urgent: {color1};
+    border-soft: {color8};
+    border-focus: {color4};
+}}

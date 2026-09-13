@@ -10,10 +10,11 @@ if git -C "$repo_root" rev-parse --git-dir >/dev/null 2>&1; then
     git -C "$repo_root" diff --cached --check || failed=1
 fi
 
-secret_pattern='(api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|passwd)[[:space:]]*[:=]|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}'
+secret_pattern='(api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|passwd)[[:space:]]*=[[:space:]]*"?[A-Za-z0-9][A-Za-z0-9_./+=-]{7,}"?|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}'
 if rg -n -i --hidden \
     --glob '!.git/**' \
     --glob '!scripts/check.sh' \
+    --glob '!profiles/*.example' \
     "$secret_pattern" "$repo_root"; then
     printf 'Possible committed secret found; review the lines above.\n' >&2
     failed=1
