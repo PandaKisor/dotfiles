@@ -153,6 +153,9 @@ bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
 # Screenshot like Windows Snipping Tool
 bindsym $mod+Shift+s exec flameshot gui
 
+# Select another MP4 and regenerate the desktop palette.
+bindsym $mod+Shift+n exec --no-startup-id ~/.config/i3/live-wallpaper.sh --next
+
 # Clipboard history
 bindsym $mod+Shift+v exec copyq show
 

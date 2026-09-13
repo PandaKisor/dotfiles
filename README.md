@@ -32,8 +32,8 @@ installing.
 Personal startup behavior is opt-in. Copy `profiles/home-i3.conf.example` to
 `~/.config/i3/config.d/90-local.conf` for the current home app assignments, and
 copy `profiles/local-startup.sh.example` to `~/.config/i3/local-startup.sh` for
-the physical display and wallpaper commands. Both destinations are ignored by
-Git so a work machine can use different values.
+physical display commands. Both destinations are ignored by Git so a work
+machine can use different values.
 
 ## Auto-tiling and wallpaper colors
 
@@ -41,13 +41,20 @@ The i3 config runs the CachyOS/Arch `autotiling` package directly. The old
 `quadrant-tiling.py` remains for reference but is not started; never run both
 helpers together.
 
-`live-wallpaper.sh` asks `video-theme.sh` to extract a frame at 12 seconds,
-scales it down for quick palette analysis, and runs Pywal16 without replacing
-the animated wallpaper. Generated colors are consumed by i3, Polybar, Rofi,
-Dunst, and new Fish/Alacritty terminals. Override the frame time with
-`PYWAL_VIDEO_SEEK`, for example `PYWAL_VIDEO_SEEK=00:00:30`.
+Put any number of `.mp4` files in the automatically created
+`~/.config/i3/wallpapers/videos/` directory. At i3 startup,
+`live-wallpaper.sh` randomly selects one while avoiding the previously selected
+video when an alternative exists. Press `Mod+Shift+N` to select another video,
+or run `~/.config/i3/live-wallpaper.sh example.mp4` to choose one by name.
 
-Install the two missing components on CachyOS with:
+Each selection asks `video-theme.sh` to extract a frame 35 percent into the
+video, scales it down for quick palette analysis, and runs Pywal16 without
+replacing the animated wallpaper. Generated colors are consumed by i3,
+Polybar, Rofi, Dunst, and new Fish/Alacritty terminals. Override the automatic
+frame time with `PYWAL_VIDEO_SEEK`, for example
+`PYWAL_VIDEO_SEEK=00:00:30`.
+
+Install the two components on CachyOS with:
 
 ```bash
 sudo pacman -S --needed autotiling

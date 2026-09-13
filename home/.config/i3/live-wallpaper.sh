@@ -5,22 +5,56 @@ set -u
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
-video="${1:-$config_home/i3/wallpapers/videos/nebula.mp4}"
+video_dir="${VIDEO_WALLPAPER_DIR:-$config_home/i3/wallpapers/videos}"
+requested_video="${1:-}"
 theme_script="$config_home/i3/video-theme.sh"
 log_dir="$state_home/i3"
 log_file="$log_dir/live-wallpaper.log"
+last_video_file="$log_dir/last-video"
 if [[ ! -d "$runtime_dir" || ! -w "$runtime_dir" ]]; then
     runtime_dir=/tmp
 fi
 pid_file="$runtime_dir/i3-live-wallpaper-$UID.pid"
 
-mkdir -p -- "$log_dir"
+mkdir -p -- "$log_dir" "$video_dir"
 : > "$log_file"
+
+# An explicit path is useful for testing. With no path (or --next), choose from
+# every MP4 in the wallpaper directory and avoid the last choice when possible.
+if [[ -n "$requested_video" && "$requested_video" != "--next" ]]; then
+    if [[ "$requested_video" != */* && -r "$video_dir/$requested_video" ]]; then
+        video="$video_dir/$requested_video"
+    else
+        video="$requested_video"
+    fi
+else
+    mapfile -d '' -t videos < <(
+        find -L "$video_dir" -maxdepth 1 -type f -iname '*.mp4' -print0 2>/dev/null |
+            sort -z
+    )
+
+    if (( ${#videos[@]} == 0 )); then
+        printf 'No MP4 files found in: %s\n' "$video_dir" > "$log_file"
+        exit 1
+    fi
+
+    last_video=""
+    [[ -r "$last_video_file" ]] && read -r last_video < "$last_video_file"
+    candidates=()
+    for candidate in "${videos[@]}"; do
+        if (( ${#videos[@]} == 1 )) || [[ "$candidate" != "$last_video" ]]; then
+            candidates+=("$candidate")
+        fi
+    done
+    video="${candidates[RANDOM % ${#candidates[@]}]}"
+fi
 
 if [[ ! -r "$video" ]]; then
     printf 'Video not found: %s\n' "$video" > "$log_file"
     exit 1
 fi
+printf '%s\n' "$video" > "$last_video_file"
+printf 'Selected video: %s\n' "$video" >> "$log_file"
 
 for command_name in xwinwrap mpv; do
     if ! command -v "$command_name" >/dev/null 2>&1; then
@@ -47,7 +81,7 @@ fi
 # Palette generation is useful but non-fatal: the wallpaper still starts when
 # Pywal is not installed or a frame cannot be extracted.
 if [[ -x "$theme_script" ]]; then
-    "$theme_script" "$video" "${PYWAL_VIDEO_SEEK:-00:00:12}" >> "$log_file" 2>&1 \
+    "$theme_script" "$video" "${PYWAL_VIDEO_SEEK:-auto}" >> "$log_file" 2>&1 \
         || printf 'Pywal theme generation failed; continuing with the wallpaper.\n' >> "$log_file"
 fi
 

@@ -73,5 +73,5 @@
 [urgency_critical]
     background = "{background}"
     foreground = "{foreground}"
-    frame_color = "{color1}"
+    frame_color = "#BF616A"
     timeout = 0

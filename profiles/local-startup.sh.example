@@ -5,7 +5,3 @@
 
 # Example physical-machine display configuration:
 # xrandr --output HDMI-1 --mode 2560x1440 --rate 120 --scale 1x1
-
-# Optional local live wallpaper (the video itself is not tracked):
-# sleep 3
-# "$HOME/.config/i3/live-wallpaper.sh" &

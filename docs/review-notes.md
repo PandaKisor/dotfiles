@@ -26,13 +26,15 @@ Backup files and generated application state were not imported.
 
 - `autotiling` replaces the custom quadrant helper at startup. The old helper
   remains as reference, but the two must not run together.
-- Pywal16 colors come from a frame extracted from the animated wallpaper. i3
-  and Rofi have static fallbacks when the Pywal cache does not exist; Polybar
-  selects a static fallback from its launch script.
+- The wallpaper launcher selects from every MP4 in its media directory and
+  avoids immediately repeating a video. Pywal16 colors come from a frame 35
+  percent into the selected animation. i3 and Rofi have static fallbacks when
+  the Pywal cache does not exist; Polybar selects a static fallback from its
+  launch script.
 - Picom is skipped automatically in a detected VM. Create the untracked file
   `~/.config/picom/enable-in-vm` to opt in on a capable VM.
-- Display layout and wallpaper startup moved out of the portable i3 config.
-  Use `profiles/local-startup.sh.example` as the per-machine starting point.
+- Display layout moved out of the portable i3 config. Use
+  `profiles/local-startup.sh.example` as the per-machine starting point.
 - Personal app assignments and startup (including Steam and Discord) moved to
   `profiles/home-i3.conf.example`; they will not be enabled at work by default.
 - Wallpaper media are excluded because the current video is about 144 MB and

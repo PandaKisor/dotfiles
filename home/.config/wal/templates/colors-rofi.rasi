@@ -1,13 +1,14 @@
 * {{
     bg: {background};
     bg-alt: {color0};
-    bg-soft: {color8};
+    bg-soft: {color4};
     fg: {foreground};
     muted: {color7};
     faint: {color8};
     accent: {color4};
     accent-2: {color6};
-    urgent: {color1};
+    urgent: #BF616A;
+    selected-fg: {background};
     border-soft: {color8};
     border-focus: {color4};
 }}
