@@ -1,0 +1,23 @@
+# Packages used directly by the tracked desktop configuration.
+i3-wm
+i3lock-color
+autotiling
+alacritty
+btop
+copyq
+dunst
+fastfetch
+fish
+flameshot
+keepassxc
+mpv
+pavucontrol
+picom
+polybar
+rofi
+thunar
+ttf-hack
+xorg-xrandr
+
+# Optional live wallpaper support also needs xwinwrap, which is not currently
+# installed and may need to come from the AUR.

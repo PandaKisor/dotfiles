@@ -1,0 +1,171 @@
+/* Dark Spotlight-style Rofi v2
+   Muted unselected rows, including alternate/active/urgent states.
+*/
+
+configuration {
+    modi: "drun,window,run";
+    show-icons: true;
+    display-drun: "Apps";
+    display-window: "Windows";
+    display-run: "Run";
+    drun-display-format: "{name}";
+    font: "Hack 11";
+    terminal: "alacritty";
+    disable-history: false;
+    sort: true;
+    sorting-method: "fzf";
+    matching: "fuzzy";
+    sidebar-mode: false;
+    tokenize: true;
+
+    drun-match-fields: "name,generic,exec,categories,keywords";
+}
+
+* {
+    bg:        #0b1118;
+    bg-alt:    #101a24;
+    bg-soft:   #121f2b;
+    fg:        #d8dee9;
+    muted:     #566575;
+    faint:     #3f4c58;
+    accent:    #88c0d0;
+    accent-2:  #00d1c7;
+    urgent:    #bf616a;
+
+    background-color: transparent;
+    text-color: @muted;
+
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 42%;
+    location: center;
+    anchor: center;
+    border: 1px;
+    border-color: #1e3442;
+    border-radius: 14px;
+    background-color: @bg;
+    padding: 18px;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing: 12px;
+}
+
+inputbar {
+    background-color: @bg-alt;
+    border: 1px;
+    border-color: #1b2d3a;
+    border-radius: 10px;
+    padding: 12px 14px;
+    spacing: 10px;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    text-color: @accent;
+    font: "Hack Bold 11";
+    padding: 0 8px 0 0;
+}
+
+entry {
+    placeholder: "Search apps...";
+    placeholder-color: @faint;
+    text-color: @fg;
+    background-color: transparent;
+    cursor: text;
+}
+
+message {
+    background-color: @bg-alt;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+textbox {
+    text-color: @muted;
+    background-color: transparent;
+}
+
+listview {
+    columns: 1;
+    lines: 8;
+    fixed-height: false;
+    dynamic: true;
+    scrollbar: false;
+    cycle: true;
+    background-color: transparent;
+    spacing: 4px;
+}
+
+element {
+    background-color: transparent;
+    border-radius: 9px;
+    padding: 8px 10px;
+    spacing: 10px;
+}
+
+element-icon {
+    size: 22px;
+    background-color: transparent;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: @muted;
+    vertical-align: 0.5;
+}
+
+/* Rofi has normal, alternate, active, and urgent row states.
+   The previous file only muted normal rows, so alternate rows stayed bright. */
+element normal.normal,
+element alternate.normal,
+element normal.active,
+element alternate.active,
+element normal.urgent,
+element alternate.urgent {
+    background-color: transparent;
+}
+
+element normal.normal element-text,
+element alternate.normal element-text,
+element normal.active element-text,
+element alternate.active element-text {
+    text-color: @muted;
+}
+
+element normal.urgent element-text,
+element alternate.urgent element-text {
+    text-color: @urgent;
+}
+
+element selected.normal,
+element selected.active,
+element selected.urgent {
+    background-color: @bg-soft;
+    border: 1px;
+    border-color: #203847;
+}
+
+element selected.normal element-text,
+element selected.active element-text {
+    text-color: @fg;
+}
+
+element selected.urgent element-text {
+    text-color: @urgent;
+}
+
+element selected.normal element-icon,
+element selected.active element-icon,
+element selected.urgent element-icon {
+    background-color: transparent;
+}
+
+mode-switcher {
+    enabled: false;
+}

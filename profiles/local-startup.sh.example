@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Copy this to ~/.config/i3/local-startup.sh, make it executable, and tailor it
+# to each machine. It is deliberately ignored by Git.
+
+# Example physical-machine display configuration:
+# xrandr --output HDMI-1 --mode 2560x1440 --rate 120 --scale 1x1
+
+# Optional local live wallpaper (the video itself is not tracked):
+# sleep 3
+# "$HOME/.config/i3/live-wallpaper.sh" &

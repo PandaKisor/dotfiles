@@ -1,0 +1,191 @@
+set $mod Mod4
+font pango:Hack 9
+floating_modifier $mod
+
+# Terminal
+set $term alacritty
+bindsym $mod+Return exec $term
+
+# Kill focused window
+bindsym $mod+q kill
+
+# Rofi apps-first launcher
+bindsym ctrl+space exec rofi -show drun
+
+# Focus
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move windows
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Splits / layouts
+bindsym $mod+h split h
+bindsym $mod+v split v
+bindsym $mod+t split toggle
+bindsym $mod+f fullscreen toggle
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+w sticky toggle
+
+# Floating / tiling
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+bindsym $mod+a focus parent
+
+# Workspaces
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# Reload / restart / exit
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'Exit i3 and end this X session?' -b 'Yes, exit i3' 'i3-msg exit'"
+
+# Resize mode
+mode "resize" {
+        bindsym Left resize shrink width 5 px or 5 ppt
+        bindsym Down resize grow height 5 px or 5 ppt
+        bindsym Up resize shrink height 5 px or 5 ppt
+        bindsym Right resize grow width 5 px or 5 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+########################################################################
+# Status bar
+########################################################################
+
+exec_always --no-startup-id ~/.config/polybar/launch.sh
+
+########################################################################
+# Window colors / borders
+########################################################################
+
+# class                 border  backgr. text    indicator child_border
+client.focused          #0B1118 #0B1118 #D8DEE9 #88C0D0   #88C0D0
+client.focused_inactive #0B1118 #0B1118 #9AA7B2 #0B1118   #0B1118
+client.unfocused        #0B1118 #0B1118 #4C566A #0B1118   #0B1118
+client.urgent           #BF616A #BF616A #0B1118 #BF616A   #BF616A
+client.placeholder      #0B1118 #0B1118 #D8DEE9 #0B1118   #0B1118
+client.background       #0B1118
+
+########################################################################
+# Floating rules
+########################################################################
+
+for_window [class="^.*"] border pixel 1
+for_window [title="(?i)calculator"] floating enable
+for_window [title="(?i)timer"] floating enable
+for_window [class="(?i)librewolf"] border none
+for_window [class="(?i)mpv"] floating enable
+for_window [class="(?i)imv"] floating enable
+for_window [class="(?i)zenity"] floating enable
+for_window [class="(?i)cachyos-welcome"] floating enable
+for_window [class="(?i)firefox"] floating disable
+for_window [class="(?i)^copyq$"] floating enable, resize set 420 360, move position center, border pixel 2
+
+# Optional machine/role-specific assignments and startup applications. The
+# tracked placeholder ensures this wildcard always resolves to at least one
+# file; add an ignored 90-local.conf for personal or workplace differences.
+include ~/.config/i3/config.d/*.conf
+
+########################################################################
+# Hotkeys
+########################################################################
+
+# Volume using PipeWire/PulseAudio compatibility
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+# Screenshot like Windows Snipping Tool
+bindsym $mod+Shift+s exec flameshot gui
+
+# Clipboard history
+bindsym $mod+Shift+v exec copyq show
+
+# Audio control panel
+bindsym $mod+Shift+a exec pavucontrol
+
+# File manager
+bindsym $mod+Shift+f exec thunar
+
+# System monitor
+bindsym $mod+Shift+b exec alacritty -e btop
+
+# Password manager
+bindsym $mod+Shift+k exec keepassxc
+
+# Lock screen
+bindsym $mod+l exec "sleep 0.1 && i3lock --blur 5"
+
+########################################################################
+# Autoload
+########################################################################
+
+# Auto-tiling mode comes from ~/.config/i3/autotiling-mode.
+# Supported values: alternating (default), quadrant, off.
+exec_always --no-startup-id ~/.config/i3/autotiling.sh
+
+# Monitor layout and machine-local wallpaper commands belong in this untracked
+# hook. Start from the example in the dotfiles repository when needed.
+exec --no-startup-id sh -c 'test -x "$HOME/.config/i3/local-startup.sh" && exec "$HOME/.config/i3/local-startup.sh"'
+
+
+# Startup services using packages you already have.
+exec --no-startup-id dunst
+exec --no-startup-id ~/.config/i3/start-picom.sh
+exec --no-startup-id tumblerd
+exec --no-startup-id copyq --start-server
+
+# nm-applet requires a system tray. Polybar is intentionally tray-free now,
+# so this is disabled to avoid hidden background tray clutter.
+#exec --no-startup-id nm-applet
+
+# Optional later, only if installed.
+#exec --no-startup-id redshift
+#exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart/
+#exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+
+# xob/pamixer volume display disabled because xob and pamixer are not installed.
+#exec_always --no-startup-id mkfifo /tmp/xobpipe && tail -f /tmp/xobpipe | xob -t 2170 & disown

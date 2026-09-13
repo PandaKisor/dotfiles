@@ -1,0 +1,11 @@
+# Copy to ~/.config/i3/config.d/90-local.conf for the personal desktop.
+
+assign [class="(?i)alacritty"] $ws1
+assign [class="(?i)steam"] $ws1
+assign [class="(?i)firefox"] $ws2
+assign [class="(?i)discord"] $ws2
+
+exec --no-startup-id alacritty
+exec --no-startup-id firefox
+exec --no-startup-id discord
+exec --no-startup-id steam

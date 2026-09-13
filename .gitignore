@@ -1,0 +1,29 @@
+# Machine-local configuration and secrets
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.credentials
+local/
+home/.config/i3/local-startup.sh
+home/.config/i3/config.d/90-local.conf
+home/.config/picom/enable-in-vm
+
+# Generated state and backup copies
+*.bak
+*.old
+*.log
+*~
+__pycache__/
+*.pyc
+home/.config/fish/fish_variables
+
+# Large/local media are intentionally not part of the portable repository
+home/.config/i3/wallpapers/
+
+# This script currently contains a private weather API key
+home/.config/polybar/scripts/weather-openmap.sh
+
+# Neovim is already managed by its own Git repository
+home/.config/nvim/
