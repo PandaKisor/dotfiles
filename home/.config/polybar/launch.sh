@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # Starts one bar per connected output and selects Pywal colors when available.
+# The launcher restarts bars after a palette change, so config watching is not
+# used while Pywal replaces the included theme file.
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -37,12 +39,12 @@ if command -v xrandr >/dev/null && xrandr --query | grep -q " connected"; then
     MONITOR="$monitor" \
       POLYBAR_NETWORK_INTERFACE="$interface" \
       POLYBAR_THEME_FILE="$theme" \
-      polybar --reload example -c "$config" \
+      polybar example -c "$config" \
       >"$log_dir/${monitor}.log" 2>&1 &
   done < <(xrandr --query | awk '/ connected/ {print $1}')
 else
   POLYBAR_NETWORK_INTERFACE="$interface" \
     POLYBAR_THEME_FILE="$theme" \
-    polybar --reload example -c "$config" \
+    polybar example -c "$config" \
     >"$log_dir/default.log" 2>&1 &
 fi
