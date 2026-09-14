@@ -64,14 +64,14 @@ if command -v dunstctl >/dev/null 2>&1 && [[ -r "$wal_cache/dunstrc" ]]; then
     dunstctl reload "$wal_cache/dunstrc" >/dev/null 2>&1 || true
 fi
 
-# Reloading i3 applies its generated color include and restarts Polybar through
-# the existing exec_always line. Issue the reload directly: a separate version
-# probe can fail even when the command socket is available to this process.
+# A full i3 restart is required for this setup to replace the generated color
+# variables reliably. It preserves the window tree and restarts Polybar and the
+# guarded autotiling helper through their exec_always entries.
 if command -v i3-msg >/dev/null 2>&1; then
-    if reload_output="$(i3-msg reload 2>&1)"; then
-        printf 'Reloaded i3 with the generated palette: %s\n' "$reload_output"
+    if restart_output="$(i3-msg restart 2>&1)"; then
+        printf 'Restarted i3 with the generated palette: %s\n' "$restart_output"
     else
-        printf 'Could not reload i3 automatically: %s\n' "$reload_output" >&2
+        printf 'Could not restart i3 automatically: %s\n' "$restart_output" >&2
         [[ -x "$config_home/polybar/launch.sh" ]] && "$config_home/polybar/launch.sh"
     fi
 elif [[ -x "$config_home/polybar/launch.sh" ]]; then

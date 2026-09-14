@@ -180,7 +180,7 @@ bindsym $mod+l exec "sleep 0.1 && i3lock --blur 5"
 
 # Standard automatic split selection. Do not run this together with the old
 # quadrant-tiling.py helper; both react to the same i3 window events.
-exec --no-startup-id autotiling
+exec_always --no-startup-id ~/.config/i3/start-autotiling.sh
 
 # Monitor layout and machine-local wallpaper commands belong in this untracked
 # hook. Start from the example in the dotfiles repository when needed.

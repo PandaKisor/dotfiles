@@ -45,7 +45,7 @@ Put any number of `.mp4` files in the automatically created
 `~/.config/i3/wallpapers/videos/` directory. At i3 startup,
 `live-wallpaper.sh` randomly selects one while avoiding the previously selected
 three videos when enough alternatives exist. Press `Mod+Shift+N` to select
-another video and apply its colors immediately, or run
+another video and apply its colors through a preserving i3 restart, or run
 `~/.config/i3/live-wallpaper.sh example.mp4` to choose one by name.
 
 `wallpaper-rotation.sh` selects another wallpaper every 30 minutes. Set

@@ -25,7 +25,8 @@ Backup files and generated application state were not imported.
 ## Portability decisions
 
 - `autotiling` replaces the custom quadrant helper at startup. The old helper
-  remains as reference, but the two must not run together.
+  remains as reference, but the two must not run together. A PID-scoped wrapper
+  restarts exactly one autotiling IPC client after an i3 restart.
 - The wallpaper launcher selects from every MP4 in its media directory, keeps
   the three most recent choices out of the candidate pool, and rotates every
   30 minutes. Pywal16 colors come from a frame 35 percent into the selected
