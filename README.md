@@ -83,6 +83,18 @@ Future widget-style applications can join the same workspace with another i3
 `assign` rule keyed to their X11 window class and a `for_window` rule selecting
 its grid position and row span.
 
+## Session polish
+
+`Mod+l` opens a blurred lock screen with a centered clock, date, authentication
+ring, and colors read from the current Pywal palette. Media and brightness keys
+remain available while the session is locked.
+
+The keyboard volume and brightness keys display short, replaceable Dunst
+progress overlays. Polybar's volume module uses the same volume overlay when it
+is clicked or scrolled. Brightness control prefers `brightnessctl`, then
+XBacklight, and uses XRandR software dimming as a portable fallback for external
+monitors without a backlight interface.
+
 ## Auto-tiling and wallpaper colors
 
 The i3 config runs the CachyOS/Arch `autotiling` package directly. The old

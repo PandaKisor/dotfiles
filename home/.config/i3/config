@@ -156,10 +156,12 @@ include ~/.config/i3/config.d/*.conf
 # Hotkeys
 ########################################################################
 
-# Volume using PipeWire/PulseAudio compatibility
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
-bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+# Palette-matched volume and display-brightness overlays.
+bindsym XF86AudioRaiseVolume exec --no-startup-id ~/.config/i3/volume-osd.sh up
+bindsym XF86AudioLowerVolume exec --no-startup-id ~/.config/i3/volume-osd.sh down
+bindsym XF86AudioMute exec --no-startup-id ~/.config/i3/volume-osd.sh mute
+bindsym XF86MonBrightnessUp exec --no-startup-id ~/.config/i3/brightness-osd.sh up
+bindsym XF86MonBrightnessDown exec --no-startup-id ~/.config/i3/brightness-osd.sh down
 
 # Control whichever MPRIS player was used most recently.
 bindsym XF86AudioPlay exec --no-startup-id playerctl --player=playerctld play-pause
@@ -192,8 +194,8 @@ bindsym $mod+Shift+b exec alacritty -e btop
 # Password manager
 bindsym $mod+Shift+k exec keepassxc
 
-# Lock screen
-bindsym $mod+l exec "sleep 0.1 && i3lock --blur 5"
+# Palette-aware lock screen with a clock and authentication feedback.
+bindsym $mod+l exec --no-startup-id ~/.config/i3/lock-screen.sh
 
 ########################################################################
 # Autoload
@@ -234,6 +236,3 @@ exec_always --no-startup-id sh -c 'exec "$HOME/.config/i3/wallpaper-rotation.sh"
 #exec --no-startup-id redshift
 #exec --no-startup-id dex -a -s /etc/xdg/autostart/:~/.config/autostart/
 #exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-
-# xob/pamixer volume display disabled because xob and pamixer are not installed.
-#exec_always --no-startup-id mkfifo /tmp/xobpipe && tail -f /tmp/xobpipe | xob -t 2170 & disown

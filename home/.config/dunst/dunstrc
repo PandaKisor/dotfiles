@@ -3,15 +3,16 @@
     monitor = 0
     follow = keyboard
     width = 360
-    height = 140
+    height = (0, 140)
     origin = top-right
-    offset = 24x54
+    offset = (24, 54)
     scale = 0
     notification_limit = 5
 
     progress_bar = true
     progress_bar_height = 6
     progress_bar_frame_width = 0
+    progress_bar_corner_radius = 3
     progress_bar_min_width = 150
     progress_bar_max_width = 320
 
@@ -75,3 +76,11 @@
     foreground = "#ECEFF4"
     frame_color = "#BF616A"
     timeout = 0
+
+[system_osd]
+    appname = System OSD
+    background = "#0B1118"
+    foreground = "#D8DEE9"
+    frame_color = "#88C0D0"
+    highlight = "#88C0D0"
+    timeout = 1
