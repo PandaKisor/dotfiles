@@ -1,6 +1,7 @@
 # Packages used directly by the tracked desktop configuration.
 alacritty
 autotiling
+bluez-utils
 btop
 capitaine-cursors
 cachyos-nord-gtk-theme-git
@@ -14,6 +15,8 @@ i3-wm
 i3lock-color
 keepassxc
 mpv
+networkmanager
+nm-connection-editor
 pavucontrol
 pear-desktop
 picom

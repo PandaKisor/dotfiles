@@ -18,6 +18,9 @@ bindsym $mod+q kill
 # Rofi apps-first launcher
 bindsym ctrl+space exec rofi -show drun
 
+# Palette-aware system and session controls.
+bindsym $mod+p exec --no-startup-id ~/.config/i3/control-center.sh
+
 # Focus
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down

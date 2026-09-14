@@ -24,6 +24,8 @@ Backup files and generated application state were not imported.
 - Removed the embedded weather key and automatic IP-geolocation request.
 - Added a consistent visual layer across i3, Picom, Polybar, Rofi, Dunst,
   Alacritty, GTK applications, and Qt applications using the GTK bridge.
+- Added a palette-aware Rofi control center with keyboard and Polybar entry
+  points. Destructive session and power choices use a separate confirmation.
 - Corrected Picom host detection so development containers do not make this
   physical desktop look like a VM; only full virtual machines skip it.
 

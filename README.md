@@ -85,6 +85,14 @@ its grid position and row span.
 
 ## Session polish
 
+`Mod+p` opens a Pywal-colored Rofi control center; the gear at the right edge
+of Polybar opens the same menu. It provides lock, audio, network, Bluetooth,
+notification, wallpaper, desktop refresh, session, and power controls. Logout,
+suspend, reboot, and shutdown require a second confirmation. Network management
+prefers the graphical NetworkManager editor and falls back to `nmtui` in
+Alacritty; Bluetooth similarly falls back to `bluetoothctl` when Blueman is not
+installed.
+
 `Mod+l` opens a blurred lock screen with a centered clock, date, authentication
 ring, and colors read from the current Pywal palette. Media and brightness keys
 remain available while the session is locked.
