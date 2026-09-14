@@ -93,6 +93,14 @@ prefers the graphical NetworkManager editor and falls back to `nmtui` in
 Alacritty; Bluetooth similarly falls back to `bluetoothctl` when Blueman is not
 installed.
 
+`Mod+n`, the Polybar bell, or the Notifications row in the control center opens
+a Rofi notification center. It lists recent app notifications, restores a
+selected item, restores the newest item, closes visible notifications, clears
+history with confirmation, and toggles Do Not Disturb. Volume and brightness
+OSDs are filtered from this history. Middle-click the Polybar bell to toggle Do
+Not Disturb directly; right-click it to close visible notifications. While
+paused, the bell changes to a muted icon and includes the number waiting.
+
 `Mod+l` opens a blurred lock screen with a centered clock, date, authentication
 ring, and colors read from the current Pywal palette. Media and brightness keys
 remain available while the session is locked.

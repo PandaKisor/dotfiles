@@ -6,6 +6,7 @@ config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 rofi_config="$config_home/rofi/config.rasi"
 wallpaper_script="$config_home/i3/live-wallpaper.sh"
 lock_script="$config_home/i3/lock-screen.sh"
+notification_script="$config_home/i3/notification-center.sh"
 
 menu_theme='window { width: 32%; } listview { lines: 11; } entry { placeholder: "Search controls..."; }'
 confirm_theme='window { width: 28%; } inputbar { children: [ prompt ]; } listview { lines: 2; }'
@@ -116,10 +117,10 @@ case "$selection" in
         fi
         ;;
     "$notifications_action")
-        if command -v dunstctl >/dev/null 2>&1; then
-            dunstctl set-paused toggle
+        if [[ -x "$notification_script" ]]; then
+            exec "$notification_script"
         else
-            notify_error "Dunst controls are unavailable."
+            notify_error "Notification center is unavailable."
         fi
         ;;
     "$wallpaper_action")

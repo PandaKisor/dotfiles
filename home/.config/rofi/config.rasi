@@ -24,16 +24,13 @@ configuration {
 * {
     bg:        #0b1118;
     bg-alt:    #101a24;
-    bg-soft:   #121f2b;
     fg:        #d8dee9;
     muted:     #566575;
     faint:     #3f4c58;
     accent:    #88c0d0;
     accent-2:  #00d1c7;
     urgent:    #bf616a;
-    selected-fg: #d8dee9;
     border-soft: #1e3442;
-    border-focus: #203847;
 
     background-color: transparent;
     text-color: @muted;
@@ -152,14 +149,14 @@ element alternate.urgent element-text {
 element selected.normal,
 element selected.active,
 element selected.urgent {
-    background-color: @bg-soft;
+    background-color: @bg-alt;
     border: 1px;
-    border-color: @border-focus;
+    border-color: @accent;
 }
 
 element selected.normal element-text,
 element selected.active element-text {
-    text-color: @selected-fg;
+    text-color: @fg;
 }
 
 element selected.urgent element-text {

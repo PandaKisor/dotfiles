@@ -26,6 +26,8 @@ Backup files and generated application state were not imported.
   Alacritty, GTK applications, and Qt applications using the GTK bridge.
 - Added a palette-aware Rofi control center with keyboard and Polybar entry
   points. Destructive session and power choices use a separate confirmation.
+- Added a Dunst-backed Rofi notification center and stateful Polybar indicator.
+  Desktop OSD events are filtered from the user-facing notification history.
 - Corrected Picom host detection so development containers do not make this
   physical desktop look like a VM; only full virtual machines skip it.
 

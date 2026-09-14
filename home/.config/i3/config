@@ -21,6 +21,9 @@ bindsym ctrl+space exec rofi -show drun
 # Palette-aware system and session controls.
 bindsym $mod+p exec --no-startup-id ~/.config/i3/control-center.sh
 
+# Notification history and Do Not Disturb controls.
+bindsym $mod+n exec --no-startup-id ~/.config/i3/notification-center.sh
+
 # Focus
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down

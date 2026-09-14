@@ -13,6 +13,7 @@ flameshot
 ffmpeg
 i3-wm
 i3lock-color
+jq
 keepassxc
 mpv
 networkmanager
