@@ -8,6 +8,7 @@
 local/
 home/.config/i3/local-startup.sh
 home/.config/i3/config.d/90-local.conf
+home/.config/i3/wallpaper.env
 home/.config/picom/disable
 home/.config/picom/enable-in-vm
 home/.config/polybar/weather.env

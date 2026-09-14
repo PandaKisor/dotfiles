@@ -3,6 +3,11 @@
 set -u
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+wallpaper_settings="$config_home/i3/wallpaper.env"
+if [[ -r "$wallpaper_settings" ]]; then
+    # shellcheck source=/dev/null
+    source "$wallpaper_settings"
+fi
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
 interval="${WALLPAPER_INTERVAL:-${VIDEO_WALLPAPER_INTERVAL:-1800}}"

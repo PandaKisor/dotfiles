@@ -84,6 +84,10 @@ Environment overrides:
 - `VIDEO_WALLPAPER_GPU_CONTEXT` — MPV GPU context.
 - `PYWAL_VIDEO_SEEK` — explicit palette-frame seek instead of automatic 35%.
 
+These values can be stored in the ignored `~/.config/i3/wallpaper.env` file.
+`profiles/work-vm-wallpaper.env.example` forces static mode and disables timed
+rotation for a constrained VM.
+
 ### Tiling and workspace layout
 
 - The packaged `autotiling` IPC helper is active through
@@ -165,7 +169,7 @@ Standard `Mod+1` through `Mod+0` workspace navigation and matching
 | Pywal templates | `home/.config/wal/templates/` |
 | Neovim | `home/.config/nvim/`, including `lazy-lock.json` |
 | Package inventory | `packages/cachyos.txt` |
-| Machine-local examples | `profiles/` |
+| Machine-local examples | `profiles/`, including the work-VM wallpaper profile |
 
 ## Verified baseline
 

@@ -145,7 +145,9 @@ automatically and excluded from Git. At i3 startup, `live-wallpaper.sh` chooses
 a static image when it detects a VM and otherwise prefers an MP4. If the
 preferred directory is empty, automatic mode falls back to the available type.
 Set `WALLPAPER_MODE=image` or `WALLPAPER_MODE=video` before i3 starts to force a
-type. Static mode uses feh and does not start xwinwrap or MPV.
+type. These settings may also be placed in the ignored machine-local
+`~/.config/i3/wallpaper.env` file. Static mode uses feh and does not start
+xwinwrap or MPV.
 
 Press `Mod+Shift+N` to select another wallpaper and apply its colors through a
 preserving i3 restart, or run `~/.config/i3/live-wallpaper.sh example.png` to
@@ -193,10 +195,13 @@ cd dotfiles
 ./scripts/check.sh
 ./scripts/manage.sh install
 mkdir -p ~/.config/i3/wallpapers/images
+cp profiles/work-vm-wallpaper.env.example ~/.config/i3/wallpaper.env
 ```
 
 Copy one or more JPG, PNG, or WebP wallpapers into the new image directory,
-then log out and back in. A VM automatically uses static mode. Run
+then log out and back in. The copied work-VM profile forces static mode and
+disables automatic rotation; use `Mod+Shift+N` when you want another image.
+Without that profile, a detected VM still prefers static images automatically. Run
 `touch ~/.config/picom/disable` if Picom needs to be suppressed explicitly;
 the VM detector already skips it by default. Start Neovim once while online so
 Lazy can download its pinned plugins.
