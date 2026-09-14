@@ -36,6 +36,16 @@ path = pathlib.Path(sys.argv[1])
 compile(path.read_bytes(), str(path), "exec")
 ' "$repo_root/home/.config/i3/quadrant-tiling.py" || failed=1
 
+if command -v luac >/dev/null 2>&1; then
+    while IFS= read -r -d '' lua_file; do
+        luac -p "$lua_file" || failed=1
+    done < <(find "$repo_root/home/.config/nvim" -type f -name '*.lua' -print0)
+fi
+
+if command -v jq >/dev/null 2>&1; then
+    jq empty "$repo_root/home/.config/nvim/lazy-lock.json" || failed=1
+fi
+
 if command -v i3 >/dev/null 2>&1; then
     runtime_dir="$(mktemp -d)"
     if ! HOME="$repo_root/home" \

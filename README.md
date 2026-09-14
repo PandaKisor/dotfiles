@@ -4,9 +4,10 @@ This repository stages reviewed configuration before it is linked into the
 home directory or pushed to GitHub. Files under `home/` mirror paths beneath
 `$HOME`.
 
-The initial snapshot focuses on the i3 desktop: i3, Picom, Polybar, Alacritty,
-Dunst, Rofi, GTK 2/3/4 theming, session defaults, and a small Fish config. See
-`docs/review-notes.md` for exclusions and portability decisions.
+The repository is a one-stop workstation setup. It includes the i3 desktop,
+Picom, Polybar, Alacritty, Dunst, Rofi, GTK 2/3/4 theming, session defaults,
+Fish, and the complete Neovim configuration. See `docs/review-notes.md` for
+exclusions and portability decisions.
 
 Future desktop work should begin with [`CURRENT_STATE.md`](CURRENT_STATE.md),
 which records the implemented behavior, live validation baseline, known
@@ -39,6 +40,22 @@ copy `profiles/local-startup.sh.example` to `~/.config/i3/local-startup.sh` for
 physical display commands. Both destinations are ignored by Git so a work
 machine can use different values.
 
+## Neovim development setup
+
+The complete Neovim configuration and its pinned Lazy plugin lockfile live
+under `home/.config/nvim/`. On first launch, Neovim bootstraps Lazy and installs
+the pinned plugins, so the work rig does not need a second configuration clone.
+
+The configuration requires Neovim 0.11 or newer for `vim.lsp.config()` and
+`vim.lsp.enable()`. Ripgrep and fd support Telescope search, jdtls supplies the
+Java language server, and Stylua and Prettier provide the configured formatters.
+The required package names are listed in `packages/cachyos.txt`.
+
+Only configuration is portable. Lazy's downloaded plugins, Treesitter parsers,
+undo files, caches, and other generated Neovim state remain outside this
+repository. The old nested `.git` directory from the former standalone Neovim
+repository must not be copied to the work rig.
+
 ## Visual design
 
 The desktop uses a restrained glass style: ten-pixel tiled gaps, rounded Picom
@@ -48,9 +65,10 @@ and Qt theme bridge in `.profile` takes effect at the next login; newly opened
 GTK applications pick up their settings immediately.
 
 Picom starts on physical hosts. It skips actual virtual machines by default so
-the work VM has a safe non-composited fallback; create the untracked file
-`~/.config/picom/enable-in-vm` there only if its graphics stack handles Picom
-well.
+the work VM has a safe non-composited fallback. If Picom causes trouble on any
+machine, run `touch ~/.config/picom/disable` to suppress it unconditionally.
+Create `~/.config/picom/enable-in-vm` only when a VM's graphics stack has been
+tested successfully; the disable marker takes precedence over that opt-in.
 
 ## Widget workspace and YouTube Music
 

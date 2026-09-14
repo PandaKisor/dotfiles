@@ -5,8 +5,9 @@
 - i3, including the existing quadrant helper
 - Picom
 - Polybar, with the weather integration rewritten to keep its key private
-- Alacritty, Dunst, Rofi, GTK 2/3/4 settings, the login theme bridge, and the
-  hand-written Fish config
+- Alacritty, Dunst, Rofi, GTK 2/3/4 settings, the login theme bridge, the
+  hand-written Fish config, and the complete Neovim configuration and plugin
+  lockfile
 
 Backup files and generated application state were not imported.
 
@@ -46,7 +47,9 @@ Backup files and generated application state were not imported.
   and Rofi have static fallbacks when the Pywal cache does not exist; Polybar
   selects a static fallback from its launch script.
 - Picom is skipped automatically in a detected VM. Create the untracked file
-  `~/.config/picom/enable-in-vm` to opt in on a capable VM.
+  `~/.config/picom/enable-in-vm` to opt in on a capable VM, or create
+  `~/.config/picom/disable` to suppress it on any machine. The disable marker
+  always takes precedence.
 - Display layout moved out of the portable i3 config. Use
   `profiles/local-startup.sh.example` as the per-machine starting point.
 - Personal app assignments and startup (including Steam and Discord) moved to
@@ -59,8 +62,9 @@ Backup files and generated application state were not imported.
 - The original weather script contained an API key. Its replacement reads an
   ignored `~/.config/polybar/weather.env` and no longer submits automatic IP
   geolocation requests. Rotate the old key before using the replacement.
-- `~/.config/nvim` is already its own Git repository with an `origin` remote.
-  Keep it separate or reference it later as a submodule.
+- Neovim's downloaded plugins, Treesitter parsers, caches, undo history, and
+  former standalone `.git` metadata are generated or local state. Only its
+  configuration and pinned Lazy lockfile are imported.
 - `fish_variables` is generated state and often includes machine-specific
   universal variables.
 - The Fish greeting now falls back to Fastfetch defaults when its separate

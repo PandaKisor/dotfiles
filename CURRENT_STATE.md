@@ -11,9 +11,9 @@ changing the configuration, then use `README.md` for installation details and
 ## Intent and scope
 
 - The current physical CachyOS machine is the visual and behavioral reference.
-- A work machine will eventually consume selected configuration through a VM.
-  Portability matters, but VM compromises should not reduce the quality of the
-  physical desktop.
+- A work machine will eventually consume the desktop and development
+  configuration through a VM. Portability matters, but VM compromises should
+  not reduce the quality of the physical desktop.
 - The desired style is a cohesive, restrained Linux rice: wallpaper-aware,
   dark, rounded, responsive, and useful without filling the screen or Polybar
   with decorative modules.
@@ -30,7 +30,9 @@ changing the configuration, then use `README.md` for installation details and
   compact wallpaper-derived focused border.
 - Picom supplies rounded corners, shadows, fading, and opacity on the physical
   host. `start-picom.sh` skips actual VMs unless the local untracked
-  `~/.config/picom/enable-in-vm` marker exists.
+  `~/.config/picom/enable-in-vm` marker exists. The local
+  `~/.config/picom/disable` marker suppresses it on any host and takes
+  precedence over the VM opt-in.
 - Polybar spans the full output and floats eight pixels below the top edge. Its
   workspace selection is a compact circle-and-number marker rather than a wide
   filled block.
@@ -155,6 +157,7 @@ Standard `Mod+1` through `Mod+0` workspace navigation and matching
 | Dunst | `home/.config/dunst/dunstrc` |
 | Picom | `home/.config/picom/picom.conf`, `home/.config/i3/start-picom.sh` |
 | Pywal templates | `home/.config/wal/templates/` |
+| Neovim | `home/.config/nvim/`, including `lazy-lock.json` |
 | Package inventory | `packages/cachyos.txt` |
 | Machine-local examples | `profiles/` |
 
@@ -202,11 +205,13 @@ Useful live logs:
 - Network and Bluetooth controls are launchers, not native Rofi device/SSID
   submenus yet.
 - The work VM still needs an independent graphics test. Picom is disabled there
-  by default, and animated wallpaper may need to be omitted or simplified.
+  by default, can be disabled explicitly with `~/.config/picom/disable`, and
+  animated wallpaper may need to be omitted or simplified.
 - Weather credentials remain local in the ignored
   `~/.config/polybar/weather.env`. Never commit that file or another API key.
-- Neovim remains a separate Git repository and should not be folded into this
-  one casually.
+- Neovim configuration and its plugin lockfile are included in this repository.
+  Downloaded plugins, parsers, caches, undo history, and the former standalone
+  repository's nested `.git` directory remain local-only.
 
 ## Optional future polish
 

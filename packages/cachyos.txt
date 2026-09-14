@@ -32,6 +32,19 @@ ttf-meslo-nerd
 xorg-xrandr
 xorg-xsetroot
 
+# Development packages used directly by the tracked Neovim configuration.
+# Neovim 0.11 or newer is required by the LSP configuration.
+fd
+gcc
+git
+jdtls
+make
+neovim
+nodejs
+prettier
+ripgrep
+stylua
+
 # AUR packages used by the desktop (install with paru, not pacman):
 # python-pywal16-git
 # xwinwrap-git
