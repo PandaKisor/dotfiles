@@ -8,6 +8,10 @@ The initial snapshot focuses on the i3 desktop: i3, Picom, Polybar, Alacritty,
 Dunst, Rofi, GTK 2/3/4 theming, session defaults, and a small Fish config. See
 `docs/review-notes.md` for exclusions and portability decisions.
 
+Future desktop work should begin with [`CURRENT_STATE.md`](CURRENT_STATE.md),
+which records the implemented behavior, live validation baseline, known
+boundaries, and remaining optional polish.
+
 ## Review the current machine
 
 ```bash
