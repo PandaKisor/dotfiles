@@ -55,7 +55,7 @@ set $ws6 "6"
 set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
-set $ws10 "10"
+set $ws10 "10:widgets"
 
 bindsym $mod+1 workspace number $ws1
 bindsym $mod+2 workspace number $ws2
@@ -140,6 +140,10 @@ for_window [class="(?i)zenity"] floating enable
 for_window [class="(?i)cachyos-welcome"] floating enable
 for_window [class="(?i)firefox"] floating disable
 for_window [class="(?i)^copyq$"] floating enable, resize set 420 360, move position center, border pixel 2
+for_window [class="^com[.]github[.]th-ch[.]youtube-music$"] floating disable, border pixel 2
+
+# Persistent, low-attention applications live together off the main workspace.
+assign [class="^com[.]github[.]th-ch[.]youtube-music$"] $ws10
 
 # Optional machine/role-specific assignments and startup applications. The
 # tracked placeholder ensures this wildcard always resolves to at least one
@@ -174,7 +178,7 @@ bindsym $mod+Shift+v exec copyq show
 # Audio control panel
 bindsym $mod+Shift+a exec pavucontrol
 
-# Dedicated YouTube Music application, with a Firefox fallback until installed.
+# Open the widget workspace and focus or launch its music application.
 bindsym $mod+m exec --no-startup-id ~/.config/i3/music-player.sh
 
 # File manager
@@ -207,6 +211,10 @@ exec --no-startup-id dunst
 exec_always --no-startup-id ~/.config/i3/start-picom.sh
 exec --no-startup-id copyq --start-server
 exec --no-startup-id playerctld daemon
+
+# Pear is the first resident of the widget workspace. Do not open the Firefox
+# fallback automatically on machines where the dedicated client is absent.
+exec --no-startup-id sh -c 'command -v pear-desktop >/dev/null 2>&1 && exec pear-desktop'
 
 # Generates a Pywal palette from one MP4 frame, then starts the animation.
 # This uses exec (not exec_always) so its i3 reload cannot create a loop.

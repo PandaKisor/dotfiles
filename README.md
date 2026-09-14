@@ -48,27 +48,33 @@ the work VM has a safe non-composited fallback; create the untracked file
 `~/.config/picom/enable-in-vm` there only if its graphics stack handles Picom
 well.
 
-## YouTube Music mini-player
+## Widget workspace and YouTube Music
 
-Press `Mod+m` to open YouTube Music. The launcher prefers
-[Pear Desktop](https://github.com/pear-devs/pear-desktop), an unofficial
-dedicated client, and falls back to a separate Firefox window when Pear is not
-installed. Install the signed CachyOS package with:
+Workspace 10 is named `10:widgets` and is reserved for persistent,
+low-attention applications. Pear Desktop is its first resident: when installed,
+it starts with the i3 session and is assigned there without pulling focus from
+the main workspace. `Mod+0` opens the widget workspace; `Mod+m` opens it and
+focuses or launches YouTube Music.
+
+The launcher prefers [Pear Desktop](https://github.com/pear-devs/pear-desktop),
+an unofficial dedicated client, and falls back to a separate Firefox window
+when Pear is not installed. Install the signed CachyOS package with:
 
 ```bash
 sudo pacman -S --needed pear-desktop
 ```
 
-In Pear, enable `Options > Plugins > Picture-in-Picture` and restart the app.
-Its default `P` shortcut toggles a saved 450x275 always-on-top mini-player. Also
-enable the Shortcuts plugin's MPRIS integration, but leave its media-key
-override disabled because i3 handles those keys through Playerctl.
+In Pear, enable the Shortcuts plugin's MPRIS integration, but leave its
+media-key override disabled because i3 handles those keys through Playerctl.
 
 Polybar shows the active track when an MPRIS player is available. Left-click
 the track to play or pause, middle-click for the previous track, right-click for
 the next track, and scroll over it to change player volume. The keyboard's
 play/pause, previous, next, and stop keys follow the most recently active media
 player, including Firefox when Pear is not running.
+
+Future widget-style applications can join the same workspace with another i3
+`assign` rule keyed to their X11 window class.
 
 ## Auto-tiling and wallpaper colors
 

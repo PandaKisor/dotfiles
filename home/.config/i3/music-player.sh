@@ -2,6 +2,13 @@
 
 set -u
 
+# Move to the shared background-app workspace before focusing or launching the
+# player. Pear is single-instance, so invoking it again raises its existing
+# window instead of creating duplicates.
+if command -v i3-msg >/dev/null 2>&1; then
+    i3-msg 'workspace number 10:widgets' >/dev/null
+fi
+
 # CachyOS has used both names for this application across packaging changes.
 for application in pear-desktop youtube-music; do
     if command -v "$application" >/dev/null 2>&1; then
