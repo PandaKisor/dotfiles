@@ -65,10 +65,15 @@ if command -v dunstctl >/dev/null 2>&1 && [[ -r "$wal_cache/dunstrc" ]]; then
 fi
 
 # Reloading i3 applies its generated color include and restarts Polybar through
-# the existing exec_always line. This script itself is started with exec once.
-if command -v i3-msg >/dev/null 2>&1 \
-    && i3-msg -t get_version >/dev/null 2>&1; then
-    i3-msg reload >/dev/null 2>&1 || true
+# the existing exec_always line. Issue the reload directly: a separate version
+# probe can fail even when the command socket is available to this process.
+if command -v i3-msg >/dev/null 2>&1; then
+    if reload_output="$(i3-msg reload 2>&1)"; then
+        printf 'Reloaded i3 with the generated palette: %s\n' "$reload_output"
+    else
+        printf 'Could not reload i3 automatically: %s\n' "$reload_output" >&2
+        [[ -x "$config_home/polybar/launch.sh" ]] && "$config_home/polybar/launch.sh"
+    fi
 elif [[ -x "$config_home/polybar/launch.sh" ]]; then
     "$config_home/polybar/launch.sh"
 fi

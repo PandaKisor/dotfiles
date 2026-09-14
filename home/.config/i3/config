@@ -180,7 +180,7 @@ bindsym $mod+l exec "sleep 0.1 && i3lock --blur 5"
 
 # Standard automatic split selection. Do not run this together with the old
 # quadrant-tiling.py helper; both react to the same i3 window events.
-exec_always --no-startup-id autotiling
+exec --no-startup-id autotiling
 
 # Monitor layout and machine-local wallpaper commands belong in this untracked
 # hook. Start from the example in the dotfiles repository when needed.
@@ -195,6 +195,10 @@ exec --no-startup-id copyq --start-server
 # Generates a Pywal palette from one MP4 frame, then starts the animation.
 # This uses exec (not exec_always) so its i3 reload cannot create a loop.
 exec --no-startup-id ~/.config/i3/live-wallpaper.sh
+
+# Selects another wallpaper and palette every 30 minutes. A runtime lock keeps
+# this daemon unique across i3 reloads and restarts.
+exec_always --no-startup-id sh -c 'exec "$HOME/.config/i3/wallpaper-rotation.sh" </dev/null >/dev/null 2>&1'
 
 # nm-applet requires a system tray. Polybar is intentionally tray-free now,
 # so this is disabled to avoid hidden background tray clutter.
