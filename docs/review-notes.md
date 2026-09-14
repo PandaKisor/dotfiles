@@ -31,12 +31,16 @@ Backup files and generated application state were not imported.
 
 - `autotiling` replaces the custom quadrant helper at startup. The old helper
   remains as reference, but the two must not run together. A PID-scoped wrapper
-  restarts exactly one autotiling IPC client after an i3 restart.
+  retires legacy copies and restarts exactly one autotiling IPC client after an
+  i3 restart.
 - The wallpaper launcher selects from every MP4 in its media directory, keeps
   the three most recent choices out of the candidate pool, and rotates every
   30 minutes. Pywal16 colors come from a frame 35 percent into the selected
-  animation. i3 and Rofi have static fallbacks when the Pywal cache does not
-  exist; Polybar selects a static fallback from its launch script.
+  animation. The old animation remains visible during palette generation, and
+  the X root is solid black underneath it for startup and player handoffs. The
+  launcher also retires renderers left by the older, pre-PID implementation. i3
+  and Rofi have static fallbacks when the Pywal cache does not exist; Polybar
+  selects a static fallback from its launch script.
 - Picom is skipped automatically in a detected VM. Create the untracked file
   `~/.config/picom/enable-in-vm` to opt in on a capable VM.
 - Display layout moved out of the portable i3 config. Use

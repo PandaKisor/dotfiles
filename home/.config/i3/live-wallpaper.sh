@@ -13,6 +13,7 @@ log_file="$log_dir/live-wallpaper.log"
 history_file="$log_dir/video-history"
 legacy_last_video_file="$log_dir/last-video"
 history_size="${VIDEO_WALLPAPER_HISTORY_SIZE:-3}"
+fallback_color="${VIDEO_WALLPAPER_FALLBACK_COLOR:-#000000}"
 if [[ ! -d "$runtime_dir" || ! -w "$runtime_dir" ]]; then
     runtime_dir=/tmp
 fi
@@ -26,6 +27,10 @@ if [[ ! "$history_size" =~ ^[1-9][0-9]*$ ]]; then
     printf 'Invalid VIDEO_WALLPAPER_HISTORY_SIZE=%s; using 3.\n' "$history_size" >> "$log_file"
     history_size=3
 fi
+if [[ ! "$fallback_color" =~ ^#[[:xdigit:]]{6}$ ]]; then
+    printf 'Invalid VIDEO_WALLPAPER_FALLBACK_COLOR=%s; using #000000.\n' "$fallback_color" >> "$log_file"
+    fallback_color="#000000"
+fi
 if ! command -v flock >/dev/null 2>&1; then
     printf 'Required command not found: flock\n' >> "$log_file"
     exit 1
@@ -36,6 +41,15 @@ exec {selection_lock_fd}>"$selection_lock"
 if ! flock -n "$selection_lock_fd"; then
     printf 'Another wallpaper selection is already in progress.\n' >> "$log_file"
     exit 0
+fi
+
+# Keep the root window neutral whenever no wallpaper renderer covers it. This
+# also removes the X server's default stipple during initial startup or errors.
+if command -v xsetroot >/dev/null 2>&1; then
+    xsetroot -solid "$fallback_color" >> "$log_file" 2>&1 \
+        || printf 'Could not set the root fallback color.\n' >> "$log_file"
+else
+    printf 'Optional command not found: xsetroot; root fallback was not set.\n' >> "$log_file"
 fi
 
 history=()
@@ -117,27 +131,49 @@ for command_name in xwinwrap mpv; do
     fi
 done
 
-# Stop only the wallpaper process recorded by an earlier run of this script.
-if [[ -r "$pid_file" ]]; then
-    read -r old_pid < "$pid_file"
-    if [[ "$old_pid" =~ ^[0-9]+$ ]] \
-        && kill -0 "$old_pid" 2>/dev/null \
-        && [[ "$(tr '\0' ' ' 2>/dev/null < "/proc/$old_pid/cmdline")" == *xwinwrap* ]]; then
-        pkill -TERM -P "$old_pid" 2>/dev/null || true
-        kill "$old_pid" 2>/dev/null || true
-        for _ in {1..20}; do
-            kill -0 "$old_pid" 2>/dev/null || break
-            sleep 0.1
-        done
-    fi
-fi
+stop_wallpaper_pid() {
+    local target_pid="$1"
+    local command_line
 
-# Palette generation is useful but non-fatal: the wallpaper still starts when
-# Pywal is not installed or a frame cannot be extracted.
+    [[ "$target_pid" =~ ^[0-9]+$ ]] || return 0
+    kill -0 "$target_pid" 2>/dev/null || return 0
+    command_line="$(tr '\0' ' ' 2>/dev/null < "/proc/$target_pid/cmdline")"
+    [[ "$command_line" == *xwinwrap* ]] || return 0
+
+    pkill -TERM -P "$target_pid" 2>/dev/null || true
+    kill "$target_pid" 2>/dev/null || true
+    for _ in {1..20}; do
+        kill -0 "$target_pid" 2>/dev/null || break
+        sleep 0.1
+    done
+}
+
+# Generate the next palette before removing the current animation. This keeps
+# the existing wallpaper visible through frame extraction and the i3 restart;
+# the prepared black root is exposed only during the final player handoff.
 if [[ -x "$theme_script" ]]; then
     "$theme_script" "$video" "${PYWAL_VIDEO_SEEK:-auto}" >> "$log_file" 2>&1 \
         || printf 'Pywal theme generation failed; continuing with the wallpaper.\n' >> "$log_file"
 fi
+
+# Stop only the wallpaper process recorded by an earlier run of this script.
+if [[ -r "$pid_file" ]]; then
+    read -r old_pid < "$pid_file"
+    stop_wallpaper_pid "$old_pid"
+fi
+
+# Earlier revisions did not record their renderer PID. Remove only orphaned
+# xwinwrap instances that launch MPV with media from this wallpaper directory.
+for command_line_file in /proc/[0-9]*/cmdline; do
+    [[ -r "$command_line_file" ]] || continue
+    candidate_pid="${command_line_file#/proc/}"
+    candidate_pid="${candidate_pid%/cmdline}"
+    candidate_command="$(tr '\0' ' ' 2>/dev/null < "$command_line_file")"
+    if [[ "$candidate_command" == *xwinwrap*mpv\ -wid* \
+        && "$candidate_command" == *"$video_dir/"* ]]; then
+        stop_wallpaper_pid "$candidate_pid"
+    fi
+done
 
 printf 'Starting live wallpaper with: %s\n' "$video" >> "$log_file"
 printf '%s\n' "$$" > "$pid_file"

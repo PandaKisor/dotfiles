@@ -107,11 +107,17 @@ Put any number of `.mp4` files in the automatically created
 three videos when enough alternatives exist. Press `Mod+Shift+N` to select
 another video and apply its colors through a preserving i3 restart, or run
 `~/.config/i3/live-wallpaper.sh example.mp4` to choose one by name.
+The X root underneath the animated wallpaper is set to solid black, so startup,
+player handoffs, and renderer failures never expose an unrelated default image.
+During a normal change, the old animation remains visible while the next color
+palette is generated; black appears only if the new player needs time to draw.
 
 `wallpaper-rotation.sh` selects another wallpaper every 30 minutes. Set
 `VIDEO_WALLPAPER_INTERVAL` in the environment before i3 starts to change the
 interval in seconds, or set it to `0` to disable automatic rotation. Set
 `VIDEO_WALLPAPER_HISTORY_SIZE` the same way to change the three-video history.
+Set `VIDEO_WALLPAPER_FALLBACK_COLOR` to another six-digit hex color if black is
+not desired.
 
 Each selection asks `video-theme.sh` to extract a frame 35 percent into the
 video, scales it down for quick palette analysis, and runs Pywal16 without
