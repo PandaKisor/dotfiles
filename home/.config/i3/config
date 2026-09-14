@@ -155,6 +155,13 @@ bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
 bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
 
+# Control whichever MPRIS player was used most recently.
+bindsym XF86AudioPlay exec --no-startup-id playerctl --player=playerctld play-pause
+bindsym XF86AudioPause exec --no-startup-id playerctl --player=playerctld pause
+bindsym XF86AudioNext exec --no-startup-id playerctl --player=playerctld next
+bindsym XF86AudioPrev exec --no-startup-id playerctl --player=playerctld previous
+bindsym XF86AudioStop exec --no-startup-id playerctl --player=playerctld stop
+
 # Screenshot like Windows Snipping Tool
 bindsym $mod+Shift+s exec flameshot gui
 
@@ -166,6 +173,9 @@ bindsym $mod+Shift+v exec copyq show
 
 # Audio control panel
 bindsym $mod+Shift+a exec pavucontrol
+
+# Dedicated YouTube Music application, with a Firefox fallback until installed.
+bindsym $mod+m exec --no-startup-id ~/.config/i3/music-player.sh
 
 # File manager
 bindsym $mod+Shift+f exec thunar
@@ -196,6 +206,7 @@ exec --no-startup-id sh -c 'test -x "$HOME/.config/i3/local-startup.sh" && exec 
 exec --no-startup-id dunst
 exec_always --no-startup-id ~/.config/i3/start-picom.sh
 exec --no-startup-id copyq --start-server
+exec --no-startup-id playerctld daemon
 
 # Generates a Pywal palette from one MP4 frame, then starts the animation.
 # This uses exec (not exec_always) so its i3 reload cannot create a loop.

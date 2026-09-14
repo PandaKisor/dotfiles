@@ -15,7 +15,9 @@ i3lock-color
 keepassxc
 mpv
 pavucontrol
+pear-desktop
 picom
+playerctl
 polybar
 pop-icon-theme
 rofi
