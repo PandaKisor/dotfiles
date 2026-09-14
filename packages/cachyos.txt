@@ -1,23 +1,28 @@
 # Packages used directly by the tracked desktop configuration.
-i3-wm
-i3lock-color
-autotiling
 alacritty
+autotiling
 btop
+capitaine-cursors
+cachyos-nord-gtk-theme-git
 copyq
 dunst
 fastfetch
 fish
 flameshot
 ffmpeg
+i3-wm
+i3lock-color
 keepassxc
 mpv
 pavucontrol
 picom
 polybar
+pop-icon-theme
 rofi
 thunar
+ttf-fira-sans
 ttf-hack
+ttf-meslo-nerd
 xorg-xrandr
 
 # AUR packages used by the desktop (install with paru, not pacman):

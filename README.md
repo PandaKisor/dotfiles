@@ -5,8 +5,8 @@ home directory or pushed to GitHub. Files under `home/` mirror paths beneath
 `$HOME`.
 
 The initial snapshot focuses on the i3 desktop: i3, Picom, Polybar, Alacritty,
-Dunst, Rofi, and a small Fish config. See `docs/review-notes.md` for exclusions
-and portability decisions.
+Dunst, Rofi, GTK 2/3/4 theming, session defaults, and a small Fish config. See
+`docs/review-notes.md` for exclusions and portability decisions.
 
 ## Review the current machine
 
@@ -34,6 +34,19 @@ Personal startup behavior is opt-in. Copy `profiles/home-i3.conf.example` to
 copy `profiles/local-startup.sh.example` to `~/.config/i3/local-startup.sh` for
 physical display commands. Both destinations are ignored by Git so a work
 machine can use different values.
+
+## Visual design
+
+The desktop uses a restrained glass style: ten-pixel tiled gaps, rounded Picom
+corners and shadows, a floating Polybar, and a shared Meslo Nerd Font. GTK apps
+use the CachyOS Nord theme, Pop icons, Capitaine cursors, and Fira Sans. The GTK
+and Qt theme bridge in `.profile` takes effect at the next login; newly opened
+GTK applications pick up their settings immediately.
+
+Picom starts on physical hosts. It skips actual virtual machines by default so
+the work VM has a safe non-composited fallback; create the untracked file
+`~/.config/picom/enable-in-vm` there only if its graphics stack handles Picom
+well.
 
 ## Auto-tiling and wallpaper colors
 

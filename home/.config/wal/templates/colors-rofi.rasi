@@ -1,6 +1,6 @@
 * {{
     bg: {background};
-    bg-alt: {color0};
+    bg-alt: {background.lighten(8%)};
     bg-soft: {color4};
     fg: {foreground};
     muted: {color7};
@@ -9,6 +9,6 @@
     accent-2: {color6};
     urgent: #BF616A;
     selected-fg: {background};
-    border-soft: {color8};
+    border-soft: {background.lighten(12%)};
     border-focus: {color4};
 }}

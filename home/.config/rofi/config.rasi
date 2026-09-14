@@ -9,7 +9,7 @@ configuration {
     display-window: "Windows";
     display-run: "Run";
     drun-display-format: "{name}";
-    font: "Hack 11";
+    font: "MesloLGS Nerd Font Mono 11";
     terminal: "alacritty";
     disable-history: false;
     sort: true;
@@ -50,9 +50,9 @@ window {
     width: 42%;
     location: center;
     anchor: center;
-    border: 1px;
+    border: 2px;
     border-color: @border-soft;
-    border-radius: 14px;
+    border-radius: 16px;
     background-color: @bg;
     padding: 18px;
 }
@@ -74,7 +74,7 @@ inputbar {
 
 prompt {
     text-color: @accent;
-    font: "Hack Bold 11";
+    font: "MesloLGS Nerd Font Mono Bold 11";
     padding: 0 8px 0 0;
 }
 

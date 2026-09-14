@@ -1,11 +1,11 @@
 [global]
-    font = Hack 10
+    font = MesloLGS Nerd Font Mono 10
     monitor = 0
     follow = keyboard
-    width = 340
-    height = 120
+    width = 360
+    height = 140
     origin = top-right
-    offset = 24x42
+    offset = 24x54
     scale = 0
     notification_limit = 5
 
@@ -50,7 +50,7 @@
     always_run_script = true
     title = Dunst
     class = Dunst
-    corner_radius = 8
+    corner_radius = 12
     ignore_dbusclose = false
     force_xwayland = false
     force_xinerama = false

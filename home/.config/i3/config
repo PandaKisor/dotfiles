@@ -1,6 +1,12 @@
 set $mod Mod4
-font pango:Hack 9
+font pango:MesloLGS Nerd Font Mono 10
 floating_modifier $mod
+
+# Keep the animated wallpaper visible and give tiled windows a card-like edge.
+default_border pixel 2
+default_floating_border pixel 2
+gaps inner 10
+gaps outer 8
 
 # Terminal
 set $term alacritty
@@ -125,7 +131,6 @@ client.background       $wal_background
 # Floating rules
 ########################################################################
 
-for_window [class="^.*"] border pixel 1
 for_window [title="(?i)calculator"] floating enable
 for_window [title="(?i)timer"] floating enable
 for_window [class="(?i)librewolf"] border none
@@ -189,7 +194,7 @@ exec --no-startup-id sh -c 'test -x "$HOME/.config/i3/local-startup.sh" && exec 
 
 # Startup services using packages you already have.
 exec --no-startup-id dunst
-exec --no-startup-id ~/.config/i3/start-picom.sh
+exec_always --no-startup-id ~/.config/i3/start-picom.sh
 exec --no-startup-id copyq --start-server
 
 # Generates a Pywal palette from one MP4 frame, then starts the animation.

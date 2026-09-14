@@ -4,10 +4,14 @@ WINIT_X11_SCALE_FACTOR = "1"
 
 [window]
 dynamic_padding = true
-decorations = "full"
+decorations = "None"
 title = "Alacritty"
 opacity = 0.92
 decorations_theme_variant = "Dark"
+
+[window.padding]
+x = 12
+y = 10
 
 [window.dimensions]
 columns = 100
@@ -25,19 +29,19 @@ multiplier = 3
 size = 12
 
 [font.normal]
-family = "Hack"
+family = "MesloLGS Nerd Font Mono"
 style = "Regular"
 
 [font.bold]
-family = "Hack"
+family = "MesloLGS Nerd Font Mono"
 style = "Bold"
 
 [font.italic]
-family = "Hack"
+family = "MesloLGS Nerd Font Mono"
 style = "Italic"
 
 [font.bold_italic]
-family = "Hack"
+family = "MesloLGS Nerd Font Mono"
 style = "Bold Italic"
 
 [selection]

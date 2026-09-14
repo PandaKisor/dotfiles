@@ -5,7 +5,8 @@
 - i3, including the existing quadrant helper
 - Picom
 - Polybar, with the weather integration rewritten to keep its key private
-- Alacritty, Dunst, Rofi, and the hand-written Fish config
+- Alacritty, Dunst, Rofi, GTK 2/3/4 settings, the login theme bridge, and the
+  hand-written Fish config
 
 Backup files and generated application state were not imported.
 
@@ -21,6 +22,10 @@ Backup files and generated application state were not imported.
 - Replaced broad wallpaper process matching with a PID file scoped to the
   current user.
 - Removed the embedded weather key and automatic IP-geolocation request.
+- Added a consistent visual layer across i3, Picom, Polybar, Rofi, Dunst,
+  Alacritty, GTK applications, and Qt applications using the GTK bridge.
+- Corrected Picom host detection so development containers do not make this
+  physical desktop look like a VM; only full virtual machines skip it.
 
 ## Portability decisions
 
@@ -61,5 +66,6 @@ paths, cache data, and work-specific policy constraints.
 
 The unused Polybar typing-speed script still names one specific Bluetooth
 keyboard. If that module is enabled later, its device should move to a local
-setting. Picom also needs a visual test in a real X11 session; this environment
-does not expose its display socket.
+setting. Picom, Polybar, and the palette-generated styling passed a live X11
+visual test on the physical desktop; the work VM still needs its own compositor
+test before opting in there.

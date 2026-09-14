@@ -54,7 +54,7 @@ trap - EXIT
 
 # -n preserves the animated wallpaper; -e lets this script reload only the
 # components used by this desktop.
-wal -n -q -e --cols16 darken -i "$frame"
+wal -n -q -e --cols16 darken --saturate 0.2 --contrast 3 -i "$frame"
 
 if command -v xrdb >/dev/null 2>&1 && [[ -r "$wal_cache/colors.Xresources" ]]; then
     xrdb -merge "$wal_cache/colors.Xresources" >/dev/null 2>&1 || true
