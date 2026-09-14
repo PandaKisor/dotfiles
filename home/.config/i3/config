@@ -226,8 +226,8 @@ exec --no-startup-id playerctld daemon
 # fallback automatically on machines where the dedicated client is absent.
 exec --no-startup-id sh -c 'command -v pear-desktop >/dev/null 2>&1 && exec pear-desktop'
 
-# Generates a Pywal palette from one MP4 frame, then starts the animation.
-# This uses exec (not exec_always) so its i3 reload cannot create a loop.
+# Selects a static image on VMs or an MP4 on physical hosts, then generates the
+# matching Pywal palette. This uses exec so its i3 restart cannot create a loop.
 exec --no-startup-id ~/.config/i3/live-wallpaper.sh
 
 # Selects another wallpaper and palette every 30 minutes. A runtime lock keeps

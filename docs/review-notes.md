@@ -38,14 +38,15 @@ Backup files and generated application state were not imported.
   remains as reference, but the two must not run together. A PID-scoped wrapper
   retires legacy copies and restarts exactly one autotiling IPC client after an
   i3 restart.
-- The wallpaper launcher selects from every MP4 in its media directory, keeps
-  the three most recent choices out of the candidate pool, and rotates every
-  30 minutes. Pywal16 colors come from a frame 35 percent into the selected
-  animation. The old animation remains visible during palette generation, and
-  the X root is solid black underneath it for startup and player handoffs. The
-  launcher also retires renderers left by the older, pre-PID implementation. i3
-  and Rofi have static fallbacks when the Pywal cache does not exist; Polybar
-  selects a static fallback from its launch script.
+- The wallpaper launcher supports static JPG/PNG/WebP images and MP4 videos,
+  keeps the three most recent choices out of the candidate pool, and rotates
+  every 30 minutes. Automatic mode prefers static images in a VM and video on a
+  physical host. Pywal16 analyzes images directly or a frame 35 percent into a
+  selected animation. The current wallpaper remains visible during palette
+  generation, and the X root is solid black underneath video for startup and
+  player handoffs. The launcher also retires renderers left by the older,
+  pre-PID implementation. i3 and Rofi have static fallbacks when the Pywal cache
+  does not exist; Polybar selects a static fallback from its launch script.
 - Picom is skipped automatically in a detected VM. Create the untracked file
   `~/.config/picom/enable-in-vm` to opt in on a capable VM, or create
   `~/.config/picom/disable` to suppress it on any machine. The disable marker
@@ -54,8 +55,8 @@ Backup files and generated application state were not imported.
   `profiles/local-startup.sh.example` as the per-machine starting point.
 - Personal app assignments and startup (including Steam and Discord) moved to
   `profiles/home-i3.conf.example`; they will not be enabled at work by default.
-- Wallpaper media are excluded because the current video is about 144 MB and
-  is a poor fit for an ordinary Git repository.
+- Wallpaper media are excluded because they are personal, machine-local assets
+  and the current video is about 144 MB.
 
 ## Deliberately excluded
 

@@ -8,6 +8,7 @@ cachyos-nord-gtk-theme-git
 copyq
 dunst
 fastfetch
+feh
 fish
 flameshot
 ffmpeg

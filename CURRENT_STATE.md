@@ -1,8 +1,9 @@
 # Current desktop state and future review
 
-Last reviewed: 2026-09-13
+Last reviewed: 2026-09-14
 
-Feature checkpoint: `ff426e9` (`Add a Rofi notification center`)
+Feature checkpoint: one-stop workstation configuration with Neovim and a
+low-power static-wallpaper path for VMs
 
 This is the handoff document for future desktop-polish work. Read it before
 changing the configuration, then use `README.md` for installation details and
@@ -19,10 +20,10 @@ changing the configuration, then use `README.md` for installation details and
   with decorative modules.
 - Files under `home/` mirror `$HOME` and are installed as individual symbolic
   links by `scripts/manage.sh`.
-- Large wallpaper videos, generated caches, secrets, machine-specific display
-  setup, and personal/work application assignments remain outside Git.
-- No GitHub remote is configured yet. The eventual export should be reviewed
-  manually before publishing or using it at work.
+- Wallpaper media, generated caches, secrets, machine-specific display setup,
+  and personal/work application assignments remain outside Git.
+- The public GitHub remote is `PandaKisor/dotfiles`. Each update should be
+  reviewed manually before publishing or using it at work.
 
 ## Current visual system
 
@@ -49,19 +50,22 @@ changing the configuration, then use `README.md` for installation details and
 
 ### Wallpaper and palette pipeline
 
-- Put any number of MP4 files in
-  `~/.config/i3/wallpapers/videos/`; the directory is intentionally ignored by
-  Git.
-- `live-wallpaper.sh` selects across all MP4 files and excludes the three most
-  recent choices when enough alternatives exist.
+- Put static JPG, PNG, or WebP files in `~/.config/i3/wallpapers/images/` and
+  MP4 files in `~/.config/i3/wallpapers/videos/`; both are ignored by Git.
+- In automatic mode, `live-wallpaper.sh` prefers static images in a VM and MP4
+  video on a physical host, with a fallback to the available type.
+- Static mode uses feh, requires no continuous decoder, and feeds the image
+  directly to Pywal. Animated mode retains the xwinwrap/MPV pipeline.
+- Selection excludes the three most recent wallpapers when enough alternatives
+  exist.
 - `wallpaper-rotation.sh` changes the wallpaper every 30 minutes by default.
-- `video-theme.sh` extracts a scaled frame 35 percent into the selected video
-  and generates Pywal templates.
+- `video-theme.sh` analyzes static images directly or extracts a scaled frame
+  35 percent into a selected video, then generates Pywal templates.
 - Palette application intentionally uses a preserving `i3-msg restart`. A
   plain i3 reload did not reliably replace imported color variables. Do not
   change this back without proving every consumer updates immediately.
-- The current video remains visible while the next frame and palette are
-  generated. The X root underneath it is solid black, so decoder startup or a
+- The current wallpaper remains visible while the next palette is generated.
+  The X root underneath animated media is solid black, so decoder startup or a
   renderer failure cannot reveal an old/default image.
 - Wallpaper process cleanup is PID-scoped, with a narrow migration cleanup for
   xwinwrap/MPV processes using media from the configured video directory. A
@@ -71,9 +75,11 @@ changing the configuration, then use `README.md` for installation details and
 
 Environment overrides:
 
-- `VIDEO_WALLPAPER_INTERVAL` — rotation seconds; `0` disables rotation.
-- `VIDEO_WALLPAPER_HISTORY_SIZE` — recent selections excluded; default `3`.
-- `VIDEO_WALLPAPER_FALLBACK_COLOR` — X root hex color; default `#000000`.
+- `WALLPAPER_MODE` — `auto`, `image`, or `video`; VMs prefer images in `auto`.
+- `WALLPAPER_INTERVAL` — rotation seconds; `0` disables rotation.
+- `WALLPAPER_HISTORY_SIZE` — recent selections excluded; default `3`.
+- `WALLPAPER_FALLBACK_COLOR` — X root hex color; default `#000000`.
+- `IMAGE_WALLPAPER_DIR` — static JPG, PNG, and WebP directory.
 - `VIDEO_WALLPAPER_DIR` — MP4 directory.
 - `VIDEO_WALLPAPER_GPU_CONTEXT` — MPV GPU context.
 - `PYWAL_VIDEO_SEEK` — explicit palette-frame seek instead of automatic 35%.
@@ -146,7 +152,7 @@ Standard `Mod+1` through `Mod+0` workspace navigation and matching
 | i3 layout and bindings | `home/.config/i3/config` |
 | Wallpaper selection | `home/.config/i3/live-wallpaper.sh` |
 | Rotation daemon | `home/.config/i3/wallpaper-rotation.sh` |
-| Video frame and Pywal | `home/.config/i3/video-theme.sh` |
+| Image/video palette extraction | `home/.config/i3/video-theme.sh` |
 | Rofi control center | `home/.config/i3/control-center.sh` |
 | Rofi notifications | `home/.config/i3/notification-center.sh` |
 | Lock and OSDs | `home/.config/i3/lock-screen.sh`, `volume-osd.sh`, `brightness-osd.sh` |
@@ -197,8 +203,8 @@ Useful live logs:
 
 ## Known boundaries
 
-- Wallpaper media are local-only and must be copied separately to another
-  machine.
+- Wallpaper media are local-only and must be copied separately. Static images
+  are the recommended low-power choice for the work VM.
 - Pywal updates existing desktop components through an i3 restart, but existing
   terminal/application processes may retain colors until they are reopened.
 - There is no system tray by design; `nm-applet` is therefore disabled.
@@ -206,7 +212,7 @@ Useful live logs:
   submenus yet.
 - The work VM still needs an independent graphics test. Picom is disabled there
   by default, can be disabled explicitly with `~/.config/picom/disable`, and
-  animated wallpaper may need to be omitted or simplified.
+  static wallpapers are selected automatically when images are available.
 - Weather credentials remain local in the ignored
   `~/.config/polybar/weather.env`. Never commit that file or another API key.
 - Neovim configuration and its plugin lockfile are included in this repository.

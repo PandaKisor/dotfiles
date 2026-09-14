@@ -139,29 +139,38 @@ The i3 config runs the CachyOS/Arch `autotiling` package directly. The old
 `quadrant-tiling.py` remains for reference but is not started; never run both
 helpers together.
 
-Put any number of `.mp4` files in the automatically created
-`~/.config/i3/wallpapers/videos/` directory. At i3 startup,
-`live-wallpaper.sh` randomly selects one while avoiding the previously selected
-three videos when enough alternatives exist. Press `Mod+Shift+N` to select
-another video and apply its colors through a preserving i3 restart, or run
-`~/.config/i3/live-wallpaper.sh example.mp4` to choose one by name.
-The X root underneath the animated wallpaper is set to solid black, so startup,
-player handoffs, and renderer failures never expose an unrelated default image.
-During a normal change, the old animation remains visible while the next color
-palette is generated; black appears only if the new player needs time to draw.
+Put JPG, PNG, or WebP files in `~/.config/i3/wallpapers/images/`, and put MP4
+files in `~/.config/i3/wallpapers/videos/`. Both directories are created
+automatically and excluded from Git. At i3 startup, `live-wallpaper.sh` chooses
+a static image when it detects a VM and otherwise prefers an MP4. If the
+preferred directory is empty, automatic mode falls back to the available type.
+Set `WALLPAPER_MODE=image` or `WALLPAPER_MODE=video` before i3 starts to force a
+type. Static mode uses feh and does not start xwinwrap or MPV.
+
+Press `Mod+Shift+N` to select another wallpaper and apply its colors through a
+preserving i3 restart, or run `~/.config/i3/live-wallpaper.sh example.png` to
+choose one by name. The selector avoids the three most recent choices when
+enough alternatives exist.
+
+For animated wallpapers, the X root underneath the animation is solid black,
+so startup, player handoffs, and renderer failures never expose an unrelated
+default image. During a normal change, the old wallpaper remains visible while
+the next color palette is generated.
 
 `wallpaper-rotation.sh` selects another wallpaper every 30 minutes. Set
-`VIDEO_WALLPAPER_INTERVAL` in the environment before i3 starts to change the
-interval in seconds, or set it to `0` to disable automatic rotation. Set
-`VIDEO_WALLPAPER_HISTORY_SIZE` the same way to change the three-video history.
-Set `VIDEO_WALLPAPER_FALLBACK_COLOR` to another six-digit hex color if black is
-not desired.
+`WALLPAPER_INTERVAL` in the environment before i3 starts to change the interval
+in seconds, or set it to `0` to disable automatic rotation. Set
+`WALLPAPER_HISTORY_SIZE` to change the three-wallpaper history, and set
+`WALLPAPER_FALLBACK_COLOR` to another six-digit hex color if black is not
+desired. The former `VIDEO_WALLPAPER_INTERVAL`,
+`VIDEO_WALLPAPER_HISTORY_SIZE`, and `VIDEO_WALLPAPER_FALLBACK_COLOR` names
+remain compatible.
 
-Each selection asks `video-theme.sh` to extract a frame 35 percent into the
-video, scales it down for quick palette analysis, and runs Pywal16 without
-replacing the animated wallpaper. Generated colors are consumed by i3,
+Each selection asks `video-theme.sh` to run Pywal16 without replacing the
+wallpaper. Static images are analyzed directly. For an MP4, it extracts and
+scales a frame 35 percent into the video. Generated colors are consumed by i3,
 Polybar, Rofi, Dunst, and new Fish/Alacritty terminals. Override the automatic
-frame time with `PYWAL_VIDEO_SEEK`, for example
+video frame time with `PYWAL_VIDEO_SEEK`, for example
 `PYWAL_VIDEO_SEEK=00:00:30`.
 
 Install the two components on CachyOS with:
@@ -174,9 +183,43 @@ paru -S --needed python-pywal16-git
 Install dependencies on CachyOS with the reviewed package names in
 `packages/cachyos.txt`. Package installation is intentionally not automatic.
 
-## GitHub preparation
+## Work VM quick start
 
-Before adding a remote:
+The public repository can be installed without signing into GitHub:
+
+```bash
+git clone https://github.com/PandaKisor/dotfiles.git
+cd dotfiles
+./scripts/check.sh
+./scripts/manage.sh install
+mkdir -p ~/.config/i3/wallpapers/images
+```
+
+Copy one or more JPG, PNG, or WebP wallpapers into the new image directory,
+then log out and back in. A VM automatically uses static mode. Run
+`touch ~/.config/picom/disable` if Picom needs to be suppressed explicitly;
+the VM detector already skips it by default. Start Neovim once while online so
+Lazy can download its pinned plugins.
+
+For later updates, pull the public repository and rerun the installer. Existing
+links consume changed files immediately; rerunning the installer adds links for
+any newly tracked files:
+
+```bash
+cd ~/dotfiles
+git pull --ff-only
+./scripts/check.sh
+./scripts/manage.sh install
+```
+
+Package installation remains a separate, deliberate step. CachyOS users can
+review `packages/cachyos.txt`; on another distribution, install the equivalent
+packages with its package manager before installing the links.
+
+## Publishing updates
+
+The canonical remote is `git@github.com:PandaKisor/dotfiles.git`. Before
+publishing an update:
 
 1. Run `./scripts/check.sh`.
 2. Review `git diff` and `git status --ignored`.
