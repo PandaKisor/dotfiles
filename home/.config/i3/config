@@ -140,7 +140,9 @@ for_window [class="(?i)zenity"] floating enable
 for_window [class="(?i)cachyos-welcome"] floating enable
 for_window [class="(?i)firefox"] floating disable
 for_window [class="(?i)^copyq$"] floating enable, resize set 420 360, move position center, border pixel 2
-for_window [class="^com[.]github[.]th-ch[.]youtube-music$"] floating disable, border pixel 2
+# Widget workspace geometry uses a responsive 3-column by 4-row grid. Pear is
+# a medium card in column 1 spanning rows 1-2; base cards are about 31x20 ppt.
+for_window [class="^com[.]github[.]th-ch[.]youtube-music$"] floating enable, resize set 31 ppt 43 ppt, move position 1 ppt 4 ppt, border pixel 2
 
 # Persistent, low-attention applications live together off the main workspace.
 assign [class="^com[.]github[.]th-ch[.]youtube-music$"] $ws10

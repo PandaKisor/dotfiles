@@ -56,6 +56,12 @@ it starts with the i3 session and is assigned there without pulling focus from
 the main workspace. `Mod+0` opens the widget workspace; `Mod+m` opens it and
 focuses or launches YouTube Music.
 
+The workspace follows a responsive three-column by four-row grid. A base widget
+is approximately 31 percent wide by 20 percent tall; Pear occupies the upper
+left column and spans two rows at 31 by 43 percent. This keeps the full player
+usable while leaving predictable slots for future status panels, calendars,
+system monitors, or communication widgets.
+
 The launcher prefers [Pear Desktop](https://github.com/pear-devs/pear-desktop),
 an unofficial dedicated client, and falls back to a separate Firefox window
 when Pear is not installed. Install the signed CachyOS package with:
@@ -74,7 +80,8 @@ play/pause, previous, next, and stop keys follow the most recently active media
 player, including Firefox when Pear is not running.
 
 Future widget-style applications can join the same workspace with another i3
-`assign` rule keyed to their X11 window class.
+`assign` rule keyed to their X11 window class and a `for_window` rule selecting
+its grid position and row span.
 
 ## Auto-tiling and wallpaper colors
 
