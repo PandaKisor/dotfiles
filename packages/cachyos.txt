@@ -3,8 +3,11 @@ alacritty
 autotiling
 bluez-utils
 btop
+calcurse
 capitaine-cursors
 cachyos-nord-gtk-theme-git
+cava
+conky
 copyq
 dunst
 fastfetch
@@ -25,6 +28,7 @@ picom
 playerctl
 polybar
 pop-icon-theme
+qalculate-gtk
 rofi
 thunar
 ttf-fira-sans
@@ -49,3 +53,13 @@ stylua
 # AUR packages used by the desktop (install with paru, not pacman):
 # python-pywal16-git
 # xwinwrap-git
+
+# Optional system login screen (separate scripts/login-screen.sh installation):
+# lightdm
+# lightdm-slick-greeter
+# python-gobject
+# Optional isolated login preview:
+# bubblewrap
+# xorg-server-xvfb
+# imagemagick
+# dbus

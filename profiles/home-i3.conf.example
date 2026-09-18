@@ -1,11 +1,16 @@
 # Copy to ~/.config/i3/config.d/90-local.conf for the personal desktop.
 
-assign [class="(?i)alacritty"] $ws1
-assign [class="(?i)steam"] $ws1
-assign [class="(?i)firefox"] $ws2
-assign [class="(?i)discord"] $ws2
+# Personal login layout. Assignments choose where new windows appear; windows
+# remain freely movable afterward. Keep this opt-in for work/VM installations.
+assign [class="(?i)^(discord|discordcanary|discordptb)$"] $ws2
+assign [class="(?i)^firefox$"] $ws2
+assign [class="(?i)^steam$"] $ws1
+# Only the login terminal is routed here. Ordinary terminals, scratchpads, and
+# widget terminals retain their existing workspace behavior.
+assign [class="^Alacritty$" instance="^i3-main-startup$"] $ws1
 
-exec --no-startup-id alacritty
-exec --no-startup-id firefox
+# exec runs once on login, unlike exec_always on wallpaper-driven i3 restarts.
 exec --no-startup-id discord
+exec --no-startup-id firefox
+exec --no-startup-id alacritty --class Alacritty,i3-main-startup
 exec --no-startup-id steam

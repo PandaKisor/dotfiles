@@ -3,6 +3,7 @@
 set -u
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+source "$config_home/i3/wallpaper-controls.sh" || exit 1
 wallpaper_settings="$config_home/i3/wallpaper.env"
 if [[ -r "$wallpaper_settings" ]]; then
     # shellcheck source=/dev/null
@@ -14,6 +15,11 @@ wallpaper_root="${WALLPAPER_DIR:-$config_home/i3/wallpapers}"
 video_dir="${VIDEO_WALLPAPER_DIR:-$wallpaper_root/videos}"
 image_dir="${IMAGE_WALLPAPER_DIR:-$wallpaper_root/images}"
 requested_wallpaper="${1:-}"
+render_only=0
+if [[ "$requested_wallpaper" == --scheduled ]]; then
+    export WALLPAPER_SCHEDULED=1
+    requested_wallpaper=--next
+fi
 wallpaper_mode="${WALLPAPER_MODE:-auto}"
 theme_script="$config_home/i3/video-theme.sh"
 log_dir="$state_home/i3"
@@ -62,6 +68,13 @@ if ! flock -n "$selection_lock_fd"; then
     exit 0
 fi
 
+# Recheck after taking the lock: the timer's earlier fullscreen check can race
+# a game launch. A blocked scheduled request is skipped rather than queued.
+if [[ "${WALLPAPER_SCHEDULED:-0}" == 1 ]] && ! wallpaper_rotation_ready; then
+    printf 'Scheduled rotation deferred: desktop or timer is paused.\n' >> "$log_file"
+    exit 0
+fi
+
 history=()
 if [[ -r "$history_file" ]]; then
     mapfile -t history < "$history_file"
@@ -70,6 +83,19 @@ elif [[ -r "$legacy_history_file" ]]; then
 elif [[ -r "$legacy_last_video_file" ]]; then
     read -r legacy_last_video < "$legacy_last_video_file"
     [[ -n "$legacy_last_video" ]] && history+=("$legacy_last_video")
+fi
+
+if [[ "$requested_wallpaper" == --current ]]; then
+    render_only=1
+    if [[ -r "$log_dir/current-wallpaper" ]]; then
+        requested_wallpaper="$(< "$log_dir/current-wallpaper")"
+    elif (( ${#history[@]} > 0 )); then
+        requested_wallpaper="${history[-1]}"
+    else
+        exit 0
+    fi
+    # An image has no animation to pause or resume.
+    [[ "${requested_wallpaper,,}" == *.mp4 ]] || exit 0
 fi
 
 images=()
@@ -163,6 +189,11 @@ case "${wallpaper,,}" in
         ;;
 esac
 
+if [[ "$wallpaper_mode" == image && "$wallpaper_type" == video ]]; then
+    printf 'Video wallpaper is disabled by WALLPAPER_MODE=image.\n' >> "$log_file"
+    exit 1
+fi
+
 if [[ "$wallpaper_type" == image ]]; then
     if ! command -v feh >/dev/null 2>&1; then
         printf 'Required command not found: feh\n' > "$log_file"
@@ -177,18 +208,6 @@ else
     done
 fi
 
-# Keep unique entries, oldest first, and update the history file atomically.
-updated_history=()
-for previous in "${history[@]}"; do
-    [[ -n "$previous" && "$previous" != "$wallpaper" ]] && updated_history+=("$previous")
-done
-updated_history+=("$wallpaper")
-if (( ${#updated_history[@]} > history_size )); then
-    updated_history=("${updated_history[@]: -history_size}")
-fi
-temporary_history="$(mktemp --tmpdir="$log_dir" .wallpaper-history.XXXXXX)"
-printf '%s\n' "${updated_history[@]}" > "$temporary_history"
-mv -- "$temporary_history" "$history_file"
 printf 'Selected %s wallpaper: %s\n' "$wallpaper_type" "$wallpaper" >> "$log_file"
 
 stop_wallpaper_pid() {
@@ -219,13 +238,31 @@ set_root_fallback() {
 
 # The live renderer covers the root while the next palette is generated. A
 # static image remains in place until feh atomically replaces the root pixmap.
+wallpaper_wait_until_ready
 if [[ "$wallpaper_type" == video ]]; then
     set_root_fallback
 fi
-if [[ -x "$theme_script" ]]; then
-    "$theme_script" "$wallpaper" "${PYWAL_VIDEO_SEEK:-auto}" >> "$log_file" 2>&1 \
-        || printf 'Pywal theme generation failed; continuing with the wallpaper.\n' >> "$log_file"
+if (( render_only == 1 )); then
+    printf 'Keeping the current palette and wallpaper selection.\n' >> "$log_file"
+elif [[ -x "$theme_script" ]]; then
+    if "$theme_script" "$wallpaper" "${PYWAL_VIDEO_SEEK:-auto}" >> "$log_file" 2>&1; then
+        printf 'Applied palette from %s.\n' "$wallpaper" >> "$log_file"
+    else
+        printf 'Pywal theme generation failed; continuing with the wallpaper.\n' >> "$log_file"
+        if command -v dunstify >/dev/null 2>&1; then
+            dunstify \
+                --appname='Wallpaper theme' \
+                --urgency=critical \
+                'Wallpaper colors were not applied' \
+                "Check $log_file for the Pywal error." >/dev/null 2>&1 || true
+        fi
+    fi
+else
+    printf 'Palette script is missing or not executable: %s\n' "$theme_script" >> "$log_file"
 fi
+
+# Palette extraction can take long enough for a game to enter fullscreen.
+wallpaper_wait_until_ready
 
 # Stop only the live wallpaper process recorded by an earlier run.
 if [[ -r "$pid_file" ]]; then
@@ -246,6 +283,25 @@ for command_line_file in /proc/[0-9]*/cmdline; do
     fi
 done
 
+# Keep unique entries, oldest first, and update the history file atomically.
+if (( render_only == 0 )); then
+    updated_history=()
+    for previous in "${history[@]}"; do
+        [[ -n "$previous" && "$previous" != "$wallpaper" ]] && updated_history+=("$previous")
+    done
+    updated_history+=("$wallpaper")
+    if (( ${#updated_history[@]} > history_size )); then
+        updated_history=("${updated_history[@]: -history_size}")
+    fi
+    temporary_history="$(mktemp --tmpdir="$log_dir" .wallpaper-history.XXXXXX)"
+    printf '%s\n' "${updated_history[@]}" > "$temporary_history"
+    mv -- "$temporary_history" "$history_file"
+fi
+
+temporary_current="$(mktemp --tmpdir="$log_dir" .current-wallpaper.XXXXXX)"
+printf '%s\n' "$wallpaper" > "$temporary_current"
+mv -- "$temporary_current" "$log_dir/current-wallpaper"
+
 if [[ "$wallpaper_type" == image ]]; then
     rm -f -- "$pid_file"
     printf 'Setting static wallpaper with: %s\n' "$wallpaper" >> "$log_file"
@@ -255,6 +311,8 @@ if [[ "$wallpaper_type" == image ]]; then
 fi
 
 printf 'Starting live wallpaper with: %s\n' "$wallpaper" >> "$log_file"
+mkdir -p -m 700 -- "$wallpaper_ipc_dir"
+animation_pause="$(wallpaper_animation_pause)"
 printf '%s\n' "$$" > "$pid_file"
 flock -u "$selection_lock_fd"
 exec {selection_lock_fd}>&-
@@ -262,6 +320,8 @@ exec {selection_lock_fd}>&-
 exec xwinwrap -fs -fdt -ni -b -nf -ov -- \
     mpv -wid %WID \
         --no-config \
+        --input-ipc-server="$wallpaper_ipc" \
+        --pause="$animation_pause" \
         --vo=gpu \
         --gpu-context="${VIDEO_WALLPAPER_GPU_CONTEXT:-auto}" \
         --hwdec=auto-safe \

@@ -12,17 +12,22 @@ gaps outer 8
 set $term alacritty
 bindsym $mod+Return exec $term
 
+# Named scratchpads: launch once, then toggle the same marked window.
+bindsym $mod+grave exec --no-startup-id ~/.config/i3/scratchpad.sh terminal
+bindsym $mod+c exec --no-startup-id ~/.config/i3/scratchpad.sh calculator
+
 # Kill focused window
 bindsym $mod+q kill
 
-# Rofi apps-first launcher
-bindsym ctrl+space exec rofi -show drun
+# Managed popup windows never hold an exclusive keyboard grab. Escape is
+# handled by i3 in popup mode and forcibly cleans up any stale Rofi process.
+bindsym --release ctrl+space exec --no-startup-id ~/.config/i3/rofi-popup.sh -show drun
 
 # Palette-aware system and session controls.
-bindsym $mod+p exec --no-startup-id ~/.config/i3/control-center.sh
+bindsym --release $mod+p exec --no-startup-id ~/.config/i3/control-center.sh
 
 # Notification history and Do Not Disturb controls.
-bindsym $mod+n exec --no-startup-id ~/.config/i3/notification-center.sh
+bindsym --release $mod+n exec --no-startup-id ~/.config/i3/notification-center.sh
 
 # Focus
 bindsym $mod+Left focus left
@@ -52,9 +57,9 @@ bindsym $mod+space focus mode_toggle
 bindsym $mod+a focus parent
 
 # Workspaces
-set $ws1 "1"
-set $ws2 "2"
-set $ws3 "3"
+set $ws1 "1:main"
+set $ws2 "2:media"
+set $ws3 "3:dev"
 set $ws4 "4"
 set $ws5 "5"
 set $ws6 "6"
@@ -72,7 +77,7 @@ bindsym $mod+6 workspace number $ws6
 bindsym $mod+7 workspace number $ws7
 bindsym $mod+8 workspace number $ws8
 bindsym $mod+9 workspace number $ws9
-bindsym $mod+0 workspace number $ws10
+bindsym $mod+0 exec --no-startup-id ~/.config/i3/widget-workspace.sh open
 
 bindsym $mod+Shift+1 move container to workspace number $ws1
 bindsym $mod+Shift+2 move container to workspace number $ws2
@@ -84,6 +89,12 @@ bindsym $mod+Shift+7 move container to workspace number $ws7
 bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# Optional session starters populate the usual workspace without permanently
+# assigning applications or moving an existing window from somewhere else.
+bindsym $mod+Control+1 exec --no-startup-id ~/.config/i3/workspace-session.sh game
+bindsym $mod+Control+2 exec --no-startup-id ~/.config/i3/workspace-session.sh media
+bindsym $mod+Control+3 exec --no-startup-id ~/.config/i3/workspace-session.sh dev
 
 # Reload / restart / exit
 bindsym $mod+Shift+c reload
@@ -103,6 +114,13 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
+# Active only while one of the managed Rofi pop-outs is alive. Because Rofi is
+# a normal window in this mode, i3 always receives Escape and can release focus.
+mode "popup-menu" {
+        bindsym Escape exec --no-startup-id ~/.config/i3/dismiss-popup.sh
+        bindsym Control+g exec --no-startup-id ~/.config/i3/dismiss-popup.sh
+}
+
 ########################################################################
 # Status bar
 ########################################################################
@@ -114,44 +132,58 @@ exec_always --no-startup-id ~/.config/polybar/launch.sh
 ########################################################################
 
 # Static defaults keep i3 usable before Pywal has generated its cache. The
-# optional include replaces these variables after video-theme.sh runs.
-set $wal_background     #0B1118
-set $wal_background_alt #101A24
-set $wal_foreground     #D8DEE9
-set $wal_foreground_alt #9AA7B2
-set $wal_muted          #4C566A
-set $wal_accent         #88C0D0
-set $wal_accent_alt     #00D1FF
-set $wal_alert          #BF616A
-include ~/.cache/wal/colors-i3.conf
+# optional include below repeats these client directives with generated colors.
+set $fallback_background     #0B1118
+set $fallback_foreground     #D8DEE9
+set $fallback_foreground_alt #9AA7B2
+set $fallback_muted          #4C566A
+set $fallback_focus          #88C0D0
+set $fallback_alert          #BF616A
 
 # class                 border  backgr. text    indicator child_border
-client.focused          $wal_background $wal_background $wal_foreground     $wal_accent     $wal_accent
-client.focused_inactive $wal_background $wal_background $wal_foreground_alt $wal_background $wal_background
-client.unfocused        $wal_background $wal_background $wal_muted          $wal_background $wal_background
-client.urgent           $wal_alert      $wal_alert      $wal_background     $wal_alert      $wal_alert
-client.placeholder      $wal_background $wal_background $wal_foreground     $wal_background $wal_background
-client.background       $wal_background
+client.focused          $fallback_focus      $fallback_background $fallback_foreground     $fallback_focus      $fallback_focus
+client.focused_inactive $fallback_background $fallback_background $fallback_foreground_alt $fallback_background $fallback_background
+client.unfocused        $fallback_background $fallback_background $fallback_muted          $fallback_background $fallback_background
+client.urgent           $fallback_alert      $fallback_alert      $fallback_background     $fallback_alert      $fallback_alert
+client.placeholder      $fallback_background $fallback_background $fallback_foreground     $fallback_background $fallback_background
+client.background       $fallback_background
+
+# i3 expands variables in a parent config before parsing its includes, so a
+# variable defined by this generated file cannot be consumed above. The file is
+# self-contained and overrides the fallback client directives directly.
+include ~/.cache/wal/colors-i3.conf
 
 ########################################################################
 # Floating rules
 ########################################################################
 
+# Some Electron and layout-restored windows can retain a borderless container
+# state. Normalize every managed application when it appears, and refresh
+# already-open applications after each preserving i3 restart.
+for_window [class=".+"] border pixel 2
+exec_always --no-startup-id i3-msg '[class=".+"] border pixel 2'
+
 for_window [title="(?i)calculator"] floating enable
 for_window [title="(?i)timer"] floating enable
-for_window [class="(?i)librewolf"] border none
 for_window [class="(?i)mpv"] floating enable
 for_window [class="(?i)imv"] floating enable
 for_window [class="(?i)zenity"] floating enable
+for_window [class="(?i)^Rofi$"] floating enable, move position center, border pixel 2
 for_window [class="(?i)cachyos-welcome"] floating enable
 for_window [class="(?i)firefox"] floating disable
 for_window [class="(?i)^copyq$"] floating enable, resize set 420 360, move position center, border pixel 2
-# Widget workspace geometry uses a responsive 3-column by 4-row grid. Pear is
-# a medium card in column 1 spanning rows 1-2; base cards are about 31x20 ppt.
+# Widget workspace geometry uses a responsive three-column grid. The three
+# upper cards occupy 31-by-43 percent each; Cava spans the lower row.
 for_window [class="^com[.]github[.]th-ch[.]youtube-music$"] floating enable, resize set 31 ppt 43 ppt, move position 1 ppt 4 ppt, border pixel 2
+for_window [class="^i3-widget-calendar$"] floating enable, resize set 31 ppt 43 ppt, move position 34 ppt 4 ppt, border pixel 2
+for_window [class="^i3-widget-system$"] floating enable, resize set 31 ppt 43 ppt, move position 67 ppt 4 ppt, border pixel 2
+for_window [class="^i3-widget-cava$"] floating enable, resize set 98 ppt 20 ppt, move position 1 ppt 50 ppt, border pixel 2
 
 # Persistent, low-attention applications live together off the main workspace.
 assign [class="^com[.]github[.]th-ch[.]youtube-music$"] $ws10
+assign [class="^i3-widget-calendar$"] $ws10
+assign [class="^i3-widget-system$"] $ws10
+assign [class="^i3-widget-cava$"] $ws10
 
 # Optional machine/role-specific assignments and startup applications. The
 # tracked placeholder ensures this wildcard always resolves to at least one
@@ -179,14 +211,14 @@ bindsym XF86AudioStop exec --no-startup-id playerctl --player=playerctld stop
 # Screenshot like Windows Snipping Tool
 bindsym $mod+Shift+s exec flameshot gui
 
-# Select another MP4 and regenerate the desktop palette.
+# Select another image or video and regenerate the desktop palette.
 bindsym $mod+Shift+n exec --no-startup-id ~/.config/i3/live-wallpaper.sh --next
 
 # Clipboard history
 bindsym $mod+Shift+v exec copyq show
 
-# Audio control panel
-bindsym $mod+Shift+a exec pavucontrol
+# Audio control panel scratchpad
+bindsym $mod+Shift+a exec --no-startup-id ~/.config/i3/scratchpad.sh audio
 
 # Open the widget workspace and focus or launch its music application.
 bindsym $mod+m exec --no-startup-id ~/.config/i3/music-player.sh
@@ -220,17 +252,27 @@ exec --no-startup-id sh -c 'test -x "$HOME/.config/i3/local-startup.sh" && exec 
 exec --no-startup-id dunst
 exec_always --no-startup-id ~/.config/i3/start-picom.sh
 exec --no-startup-id copyq --start-server
-exec --no-startup-id playerctld daemon
+exec --no-startup-id ~/.config/i3/music-player.sh --daemon
 
-# Pear is the first resident of the widget workspace. Do not open the Firefox
-# fallback automatically on machines where the dedicated client is absent.
-exec --no-startup-id sh -c 'command -v pear-desktop >/dev/null 2>&1 && exec pear-desktop'
+# Name only workspaces that already exist; the standard bindings create any
+# missing named workspace on demand.
+exec_always --no-startup-id ~/.config/i3/workspace-session.sh names
+
+# Keep the widget workspace populated without changing the startup workspace.
+# The monitor skips missing packages, never duplicates existing cards, and
+# restores a widget if its application exits.
+exec --no-startup-id ~/.config/i3/widget-workspace.sh monitor
+
+# Pear shares the widget workspace. Give audio time to initialize at login;
+# the autostart helper neither switches workspace nor opens a browser fallback.
+exec --no-startup-id ~/.config/i3/music-player.sh --autostart
 
 # Selects a static image on VMs or an MP4 on physical hosts, then generates the
 # matching Pywal palette. This uses exec so its i3 restart cannot create a loop.
 exec --no-startup-id ~/.config/i3/live-wallpaper.sh
 
-# Selects another wallpaper and palette every 30 minutes. A runtime lock keeps
+# Selects another wallpaper after 30 unpaused minutes; fullscreen pauses it.
+# Also manages fullscreen animation pause. A runtime lock keeps
 # this daemon unique across i3 reloads and restarts.
 exec_always --no-startup-id sh -c 'exec "$HOME/.config/i3/wallpaper-rotation.sh" </dev/null >/dev/null 2>&1'
 

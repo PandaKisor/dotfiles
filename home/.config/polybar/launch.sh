@@ -5,6 +5,14 @@
 # used while Pywal replaces the included theme file.
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+if [[ -r "$config_home/i3/desktop.env" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_home/i3/desktop.env"
+fi
+export POLYBAR_MODULES_RIGHT='cpu memory network volume date notifications control'
+if [[ "${MUSIC_ENABLED:-1}" != 0 ]]; then
+  POLYBAR_MODULES_RIGHT="media $POLYBAR_MODULES_RIGHT"
+fi
 cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 config="$config_home/polybar/config.ini"

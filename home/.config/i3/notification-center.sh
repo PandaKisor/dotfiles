@@ -4,20 +4,22 @@ set -u
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 rofi_config="$config_home/rofi/config.rasi"
+rofi_popup="$config_home/i3/rofi-popup.sh"
 menu_theme='window { width: 38%; } listview { lines: 10; } entry { placeholder: "Search notifications..."; }'
 confirm_theme='window { width: 28%; } inputbar { children: [ prompt ]; } listview { lines: 2; }'
 
-for command_name in dunstctl jq rofi; do
+for command_name in dunstctl jq; do
     command -v "$command_name" >/dev/null 2>&1 || exit 1
 done
+[[ -x "$rofi_popup" ]] || exit 1
 
 confirm_clear() {
     local answer
 
-    answer="$(printf 'Cancel\nYes, clear history\n' | rofi \
+    answer="$(printf 'Cancel\nYes, clear history\n' | "$rofi_popup" \
         -dmenu -only-match -no-sort -selected-row 0 \
         -p "Confirm" -mesg "Remove every saved notification?" \
-        -config "$rofi_config" -theme-str "$confirm_theme")"
+        -config "$rofi_config" -theme-str "$confirm_theme")" || exit 0
     [[ "$answer" == "Yes, clear history" ]]
 }
 
@@ -82,10 +84,10 @@ else
     menu_rows+=("$empty_row")
 fi
 
-selection_index="$(printf '%s\n' "${menu_rows[@]}" | rofi \
+selection_index="$(printf '%s\n' "${menu_rows[@]}" | "$rofi_popup" \
     -dmenu -i -only-match -no-sort -format i \
     -p "Notifications" -mesg "$state_message" \
-    -config "$rofi_config" -theme-str "$menu_theme")"
+    -config "$rofi_config" -theme-str "$menu_theme")" || exit 0
 
 [[ "$selection_index" =~ ^[0-9]+$ ]] || exit 0
 

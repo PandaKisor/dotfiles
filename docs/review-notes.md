@@ -47,6 +47,10 @@ Backup files and generated application state were not imported.
   player handoffs. The launcher also retires renderers left by the older,
   pre-PID implementation. i3 and Rofi have static fallbacks when the Pywal cache
   does not exist; Polybar selects a static fallback from its launch script.
+- Neovim and Lualine now read the same `colors.json` cache through a local
+  contrast-aware theme module. A lightweight timer refreshes open sessions when
+  Pywal atomically replaces the cache, while `nord.nvim` remains available when
+  no valid palette exists.
 - Picom is skipped automatically in a detected VM. Create the untracked file
   `~/.config/picom/enable-in-vm` to opt in on a capable VM, or create
   `~/.config/picom/disable` to suppress it on any machine. The disable marker

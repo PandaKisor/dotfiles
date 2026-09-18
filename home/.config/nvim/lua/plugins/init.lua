@@ -1,11 +1,10 @@
 return {
 	{
 		"shaunsingh/nord.nvim",
+		lazy = false,
 		priority = 1000,
 		config = function()
-			vim.g.nord_contrast = true
-			vim.g.nord_borders = true
-			vim.cmd.colorscheme("nord")
+			require("config.theme").setup()
 		end,
 	},
 
@@ -13,7 +12,13 @@ return {
 		"nvim-lualine/lualine.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
-			require("lualine").setup({ options = { theme = "nord" } })
+			require("lualine").setup({
+				options = {
+					theme = function()
+						return require("config.theme").lualine_theme()
+					end,
+				},
+			})
 		end,
 	},
 

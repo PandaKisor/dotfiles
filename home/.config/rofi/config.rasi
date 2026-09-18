@@ -17,6 +17,7 @@ configuration {
     matching: "fuzzy";
     sidebar-mode: false;
     tokenize: true;
+    kb-cancel: "Escape,Control+g,Control+bracketleft";
 
     drun-match-fields: "name,generic,exec,categories,keywords";
 }

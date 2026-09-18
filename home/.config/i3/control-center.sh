@@ -3,12 +3,22 @@
 set -u
 
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+if [[ -r "$config_home/i3/wallpaper.env" ]]; then
+    # shellcheck source=/dev/null
+    source "$config_home/i3/wallpaper.env"
+fi
 rofi_config="$config_home/rofi/config.rasi"
+rofi_popup="$config_home/i3/rofi-popup.sh"
 wallpaper_script="$config_home/i3/live-wallpaper.sh"
 lock_script="$config_home/i3/lock-screen.sh"
 notification_script="$config_home/i3/notification-center.sh"
+network_script="$config_home/i3/network-menu.sh"
+bluetooth_script="$config_home/i3/bluetooth-menu.sh"
+audio_script="$config_home/i3/audio-menu.sh"
+wallpaper_controls="$config_home/i3/wallpaper-controls.sh"
+source "$wallpaper_controls"
 
-menu_theme='window { width: 32%; } listview { lines: 11; } entry { placeholder: "Search controls..."; }'
+menu_theme='window { width: 32%; } listview { lines: 13; } entry { placeholder: "Search controls..."; }'
 confirm_theme='window { width: 28%; } inputbar { children: [ prompt ]; } listview { lines: 2; }'
 
 notify_error() {
@@ -27,14 +37,14 @@ confirm_action() {
     local confirmation="Yes, $verb"
     local answer
 
-    answer="$(printf 'Cancel\n%s\n' "$confirmation" | rofi \
+    answer="$(printf 'Cancel\n%s\n' "$confirmation" | "$rofi_popup" \
         -dmenu -only-match -no-sort -selected-row 0 \
         -p "Confirm" -mesg "$message" \
-        -config "$rofi_config" -theme-str "$confirm_theme")"
+        -config "$rofi_config" -theme-str "$confirm_theme")" || exit 0
     [[ "$answer" == "$confirmation" ]]
 }
 
-command -v rofi >/dev/null 2>&1 || exit 1
+[[ -x "$rofi_popup" ]] || exit 1
 
 network_action="  Network"
 if command -v nmcli >/dev/null 2>&1; then
@@ -61,6 +71,10 @@ fi
 lock_action="  Lock screen"
 audio_action="  Audio controls"
 wallpaper_action="  Next wallpaper"
+timer_action="  Pause wallpaper timer"
+[[ -e "$rotation_pause_file" ]] && timer_action="  Resume wallpaper timer"
+animation_action="  Pause animation (still frame)"
+[[ -e "$animation_pause_file" ]] && animation_action="  Resume wallpaper animation"
 refresh_action="  Refresh desktop"
 suspend_action="  Suspend"
 logout_action="  Log out"
@@ -74,6 +88,13 @@ actions=(
     "$bluetooth_action"
     "$notifications_action"
     "$wallpaper_action"
+)
+[[ "${WALLPAPER_INTERVAL:-${VIDEO_WALLPAPER_INTERVAL:-1800}}" == 0 ]] || actions+=("$timer_action")
+case "${WALLPAPER_MODE:-auto}" in
+    image|images|static) ;;
+    *) actions+=("$animation_action") ;;
+esac
+actions+=(
     "$refresh_action"
     "$suspend_action"
     "$logout_action"
@@ -81,10 +102,10 @@ actions=(
     "$poweroff_action"
 )
 
-selection="$(printf '%s\n' "${actions[@]}" | rofi \
+selection="$(printf '%s\n' "${actions[@]}" | "$rofi_popup" \
     -dmenu -i -only-match -no-sort \
     -p "Control" -mesg "System and session controls" \
-    -config "$rofi_config" -theme-str "$menu_theme")"
+    -config "$rofi_config" -theme-str "$menu_theme")" || exit 0
 
 case "$selection" in
     "$lock_action")
@@ -92,14 +113,16 @@ case "$selection" in
         notify_error "Lock-screen script is unavailable."
         ;;
     "$audio_action")
-        if command -v pavucontrol >/dev/null 2>&1; then
-            launch_detached pavucontrol
+        if [[ -x "$audio_script" ]]; then
+            exec "$audio_script"
         else
-            notify_error "Install pavucontrol to manage audio."
+            notify_error "Audio controls are unavailable."
         fi
         ;;
     "$network_action")
-        if command -v nm-connection-editor >/dev/null 2>&1; then
+        if [[ -x "$network_script" ]]; then
+            exec "$network_script"
+        elif command -v nm-connection-editor >/dev/null 2>&1; then
             launch_detached nm-connection-editor
         elif command -v nmtui >/dev/null 2>&1 && command -v alacritty >/dev/null 2>&1; then
             launch_detached alacritty --title "Network controls" -e nmtui
@@ -108,7 +131,9 @@ case "$selection" in
         fi
         ;;
     "$bluetooth_action")
-        if command -v blueman-manager >/dev/null 2>&1; then
+        if [[ -x "$bluetooth_script" ]]; then
+            exec "$bluetooth_script"
+        elif command -v blueman-manager >/dev/null 2>&1; then
             launch_detached blueman-manager
         elif command -v bluetoothctl >/dev/null 2>&1 && command -v alacritty >/dev/null 2>&1; then
             launch_detached alacritty --title "Bluetooth controls" -e bluetoothctl
@@ -132,6 +157,12 @@ case "$selection" in
         ;;
     "$refresh_action")
         i3-msg restart >/dev/null
+        ;;
+    "$timer_action")
+        exec "$wallpaper_controls" toggle-timer
+        ;;
+    "$animation_action")
+        exec "$wallpaper_controls" toggle-animation
         ;;
     "$suspend_action")
         confirm_action "suspend" "Pause this session and put the computer to sleep?" \
