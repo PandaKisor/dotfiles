@@ -6,8 +6,9 @@ repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 failed=0
 
 if git -C "$repo_root" rev-parse --git-dir >/dev/null 2>&1; then
-    git -C "$repo_root" diff --check || failed=1
-    git -C "$repo_root" diff --cached --check || failed=1
+    # Validation must also work in a terminal on VMs without a pager installed.
+    git --no-pager -C "$repo_root" diff --check || failed=1
+    git --no-pager -C "$repo_root" diff --cached --check || failed=1
 fi
 
 secret_pattern='(api[_-]?key|access[_-]?token|auth[_-]?token|client[_-]?secret|password|passwd)[[:space:]]*=[[:space:]]*"?[A-Za-z0-9][A-Za-z0-9_./+=-]{7,}"?|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{20,}'
