@@ -5,6 +5,11 @@ set -euo pipefail
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 failed=0
 
+if ! command -v rg >/dev/null 2>&1; then
+    printf 'Required command not found: rg. Install the ripgrep package and rerun this check.\n' >&2
+    exit 1
+fi
+
 if git -C "$repo_root" rev-parse --git-dir >/dev/null 2>&1; then
     # Validation must also work in a terminal on VMs without a pager installed.
     git --no-pager -C "$repo_root" diff --check || failed=1
