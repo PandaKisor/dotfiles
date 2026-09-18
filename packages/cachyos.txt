@@ -36,6 +36,7 @@ ttf-hack
 ttf-meslo-nerd
 xorg-xrandr
 xorg-xsetroot
+xcompmgr
 
 # Development packages used directly by the tracked Neovim configuration.
 # Neovim 0.11 or newer is required by the LSP configuration.

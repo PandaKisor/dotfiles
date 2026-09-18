@@ -36,7 +36,6 @@ pid_file="$runtime_dir/i3-live-wallpaper-$UID.pid"
 selection_lock="$runtime_dir/i3-live-wallpaper-$UID.lock"
 
 mkdir -p -- "$log_dir" "$video_dir" "$image_dir"
-: > "$log_file"
 
 case "${wallpaper_mode,,}" in
     auto) wallpaper_mode=auto ;;
@@ -64,9 +63,11 @@ fi
 # Prevent a timer event and a manual key press from selecting at the same time.
 exec {selection_lock_fd}>"$selection_lock"
 if ! flock -n "$selection_lock_fd"; then
+    printf 'Another wallpaper selection is already in progress. Check %s\n' "$log_file" >&2
     printf 'Another wallpaper selection is already in progress.\n' >> "$log_file"
     exit 0
 fi
+: > "$log_file"
 
 # Recheck after taking the lock: the timer's earlier fullscreen check can race
 # a game launch. A blocked scheduled request is skipped rather than queued.
@@ -238,7 +239,7 @@ set_root_fallback() {
 
 # The live renderer covers the root while the next palette is generated. A
 # static image remains in place until feh atomically replaces the root pixmap.
-wallpaper_wait_until_ready
+wallpaper_wait_until_ready >> "$log_file" 2>&1 || { cat "$log_file" >&2; exit 1; }
 if [[ "$wallpaper_type" == video ]]; then
     set_root_fallback
 fi
@@ -262,7 +263,7 @@ else
 fi
 
 # Palette extraction can take long enough for a game to enter fullscreen.
-wallpaper_wait_until_ready
+wallpaper_wait_until_ready >> "$log_file" 2>&1 || { cat "$log_file" >&2; exit 1; }
 
 # Stop only the live wallpaper process recorded by an earlier run.
 if [[ -r "$pid_file" ]]; then

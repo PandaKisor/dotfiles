@@ -27,8 +27,19 @@ wallpaper_rotation_ready() {
 }
 
 wallpaper_wait_until_ready() {
+    local command_name waiting=0
+    for command_name in i3-msg jq; do
+        if ! command -v "$command_name" >/dev/null 2>&1; then
+            printf 'Required command not found: %s\n' "$command_name" >&2
+            return 1
+        fi
+    done
     while ! wallpaper_desktop_ready \
         || { [[ "${WALLPAPER_SCHEDULED:-0}" == 1 ]] && [[ -e "$rotation_pause_file" ]]; }; do
+        if (( waiting == 0 )); then
+            printf 'Waiting for i3 IPC, fullscreen applications to close, or scheduled rotation to resume.\n' >&2
+            waiting=1
+        fi
         sleep 2
     done
 }

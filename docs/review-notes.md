@@ -51,10 +51,11 @@ Backup files and generated application state were not imported.
   contrast-aware theme module. A lightweight timer refreshes open sessions when
   Pywal atomically replaces the cache, while `nord.nvim` remains available when
   no valid palette exists.
-- Picom is skipped automatically in a detected VM. Create the untracked file
-  `~/.config/picom/enable-in-vm` to opt in on a capable VM, or create
-  `~/.config/picom/disable` to suppress it on any machine. The disable marker
-  always takes precedence.
+- VMs now select a separate Picom XRender profile with xcompmgr as a fallback
+  after an error exit; see README for local mode selection and the fallback's
+  lack of rounded corners. The old `enable-in-vm` marker selects the physical
+  Picom profile in auto mode. `~/.config/picom/disable` suppresses both
+  compositors and always takes precedence.
 - Display layout moved out of the portable i3 config. Use
   `profiles/local-startup.sh.example` as the per-machine starting point.
 - Personal app assignments and startup (including Steam and Discord) moved to

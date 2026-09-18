@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Isolated regression tests; never contact or alter the live desktop."""
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -73,6 +74,42 @@ fi
         self.assertFalse(self.ready())
         self.stub("i3-msg", "exit 1\n")
         self.assertFalse(self.ready())
+
+    def test_missing_desktop_tools_fail_without_holding_selection_lock(self):
+        image = self.root / 'wallpaper.png'
+        image.touch()
+        # A minimal PATH reproduces a fresh VM without jq, independently of
+        # which packages are installed on the test host.
+        for name in ('bash', 'mkdir', 'find', 'sort', 'flock', 'cat'):
+            (self.bin / name).symlink_to(shutil.which(name))
+        self.stub('feh', 'printf rendered > "$TEST_ROOT/rendered"\n')
+        self.stub('wal', 'exit 0\n')
+        self.env['PATH'] = str(self.bin)
+        self.env['WALLPAPER_MODE'] = 'image'
+        for missing in ('jq', 'i3-msg'):
+            if missing == 'i3-msg':
+                (self.bin / 'i3-msg').unlink()
+                (self.bin / 'jq').symlink_to(shutil.which('jq'))
+            for script in ('live-wallpaper.sh', 'video-theme.sh'):
+                with self.subTest(missing=missing, script=script):
+                    result = self.run_script(script, str(image))
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn(f'Required command not found: {missing}', result.stderr)
+            lock = self.root / f'runtime/i3-live-wallpaper-{os.getuid()}.lock'
+            with lock.open('a') as handle:
+                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.assertFalse((self.root / 'rendered').exists())
+
+    def test_competing_selection_preserves_active_log(self):
+        log = self.state / 'live-wallpaper.log'
+        log.write_text('Selected image wallpaper: diagnostic.png\n')
+        lock = self.root / f'runtime/i3-live-wallpaper-{os.getuid()}.lock'
+        with lock.open('a') as handle:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            result = self.run_script('live-wallpaper.sh')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('Another wallpaper selection', result.stderr)
+        self.assertIn('Selected image wallpaper: diagnostic.png', log.read_text())
 
     def test_static_work_profile_has_no_polling_or_video(self):
         (self.config / 'wallpaper.env').write_text('WALLPAPER_MODE=image\nWALLPAPER_INTERVAL=0\n')

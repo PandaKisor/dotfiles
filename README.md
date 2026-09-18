@@ -79,11 +79,44 @@ Polybar keeps workspace labels compact and shows a palette-colored circle for
 the focused or urgent workspace. Every label state has the same outer padding,
 so adding the circle does not collapse the space between workspace numbers.
 
-Picom starts on physical hosts. It skips actual virtual machines by default so
-the work VM has a safe non-composited fallback. If Picom causes trouble on any
-machine, run `touch ~/.config/picom/disable` to suppress it unconditionally.
-Create `~/.config/picom/enable-in-vm` only when a VM's graphics stack has been
-tested successfully; the disable marker takes precedence over that opt-in.
+The shared compositor launcher keeps the existing Picom configuration on
+physical hosts. On a VM it selects `home/.config/picom/vm.conf`: Picom's XRender
+backend, 12-pixel rounded corners, soft shadows, and opacity, with OpenGL, blur,
+animations, and VSync disabled. If Picom is missing or exits with an error, it
+tries xcompmgr once. Xcompmgr preserves shadows and application-provided
+transparency (including Alacritty), but **cannot round corners or apply Picom's
+per-application and inactive-window opacity rules**. A running compositor that
+renders incorrectly must be switched manually; the launcher cannot detect
+graphical corruption. See the [Picom](https://picom.app/) and
+[xcompmgr](https://man.archlinux.org/man/xcompmgr.1.en) documentation.
+
+Install the primary and fallback compositors on an Arch VM with:
+
+```bash
+sudo pacman -S --needed picom xcompmgr
+```
+
+Set `COMPOSITOR_MODE` in the ignored `~/.config/i3/desktop.env` to select:
+
+| Value | Behavior |
+| --- | --- |
+| `auto` (default) | Physical host: Picom; VM: XRender profile with xcompmgr fallback |
+| `vm` | XRender profile with xcompmgr fallback, regardless of VM detection |
+| `picom` | Original physical-host Picom profile |
+| `xcompmgr` | Direct fallback, with square corners and application-provided opacity |
+| `off` | No compositor |
+
+Log out and back in after changing the mode; the launcher leaves already
+running compositors alone. It prevents duplicate launches across i3 restarts
+and logs selection and failures to `~/.local/state/i3/picom.log`.
+`touch ~/.config/picom/disable` remains an unconditional startup opt-out for
+both compositors. Remove that marker to enable compositing again. The legacy
+`enable-in-vm` marker retains the physical Picom profile in `auto` mode; an
+explicit `COMPOSITOR_MODE` takes precedence over it. Package installation is
+separate from `scripts/manage.sh install`, which links both profiles.
+
+Run `python3 scripts/test-compositor-startup.py` for isolated selection,
+fallback, duplicate-start, and shutdown checks.
 
 ## Widget workspace and YouTube Music
 
@@ -340,8 +373,12 @@ session. Apply these copies on the work VM only; omit `desktop.env` or set its
 switches to `1` to retain the personal desktop behavior.
 Without that profile, a detected VM still prefers static images automatically. Run
 `touch ~/.config/picom/disable` if Picom needs to be suppressed explicitly;
-the VM detector already skips it by default. Start Neovim once while online so
-Lazy can download its pinned plugins.
+this also suppresses the backup compositor at the next login. The desktop
+profile sets `COMPOSITOR_MODE=vm`; existing profiles without this setting use
+automatic detection. Install `picom` and `xcompmgr`, rerun the dotfiles installer
+to link the new `vm.conf`, and remove any old `disable` marker if you want
+compositing enabled. Start Neovim once while online so Lazy can download its
+pinned plugins.
 
 For later updates, pull the public repository and rerun the installer. Existing
 links consume changed files immediately; rerunning the installer adds links for
@@ -360,6 +397,27 @@ packages with its package manager before installing the links.
 For this work profile, omit `cava`, `pear-desktop`, `playerctl`, `mpv`,
 `ffmpeg`, and the optional `xwinwrap-git`; static wallpaper still uses `feh`
 and Pywal16. These packages may remain installed if other applications use them.
+
+If wallpaper selection appears stuck, run these inside the VM's i3 terminal:
+
+```bash
+command -v jq feh i3-msg
+i3-msg -t get_tree | jq -r .type
+tail -n 40 ~/.local/state/i3/live-wallpaper.log
+```
+
+The tree command should print `root`. `jq` is required for fullscreen detection,
+including static wallpaper. Older selectors waited indefinitely when it was
+missing and held the selection lock; installing it allows that wait to resume.
+On Arch, `sudo pacman -S --needed jq feh` supplies the parser and static renderer.
+Close fullscreen applications before retrying. A concurrent-selection message
+means another process holds the lock; removing the lock file does not stop that
+process. Current selectors report missing desktop tools and preserve the active
+selection's log when another invocation encounters its lock.
+
+Starting i3 using `startx` is separate from wallpaper selection. These dotfiles
+do not install or enable a display manager; the optional login-screen installer
+only styles an already configured LightDM Slick Greeter.
 
 ## Publishing updates
 

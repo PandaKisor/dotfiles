@@ -32,10 +32,14 @@ changing the configuration, then use `README.md` for installation details and
   it. A global rule covers new application windows, and an i3-restart hook
   restores borders on already-open windows such as Steam and Discord.
 - Picom supplies rounded corners, shadows, fading, and opacity on the physical
-  host. `start-picom.sh` skips actual VMs unless the local untracked
-  `~/.config/picom/enable-in-vm` marker exists. The local
-  `~/.config/picom/disable` marker suppresses it on any host and takes
-  precedence over the VM opt-in.
+  host. `start-picom.sh` selects a separate XRender `vm.conf` on VMs, retaining
+  corners, shadows, and opacity without OpenGL, blur, or animations. An error
+  exit or absent Picom triggers one xcompmgr fallback attempt. That fallback
+  supports shadows and application transparency, but no rounded corners or
+  Picom opacity rules. `COMPOSITOR_MODE=auto|vm|picom|xcompmgr|off` in the local
+  `desktop.env` overrides selection. The legacy `enable-in-vm` marker selects
+  the physical profile in auto mode; `~/.config/picom/disable` suppresses both
+  compositors in every mode. Mode changes take effect after logout/login.
 - Polybar spans the full output and floats eight pixels below the top edge. Its
   workspace selection is a compact circle-and-number marker rather than a wide
   filled block. Focused and urgent markers use the same one-cell outer padding
@@ -60,6 +64,19 @@ changing the configuration, then use `README.md` for installation details and
 
 ### Work VM profile
 
+- VM wallpaper troubleshooting: a missing `jq` previously made the fullscreen
+  guard wait forever while holding the selection lock. Desktop waits now fail
+  explicitly for missing `jq` or `i3-msg`, log when waiting, and competing
+  selectors preserve the active log. Nine isolated wallpaper checks pass,
+  including missing-tool failures and lock release. The user confirmed the
+  wallpaper now loads and Pywal16 installation restored theme switching.
+- Eleven isolated compositor checks cover physical/container/VM selection,
+  fallback with absent or failed Picom, explicit modes, old markers, existing
+  compositors, duplicate starts, shutdown, and lock release. An actual Picom
+  XRender session in Xvfb passed screenshot/pixel checks for all three effects:
+  rounded corners, shadow darkening, and 75-percent application opacity.
+  Xcompmgr execution is covered by a stub here (the binary is not installed on
+  the primary host); its visual behavior and the VM GPU remain unverified.
 - Copy `profiles/work-vm-desktop.env.example` to the ignored
   `~/.config/i3/desktop.env` on the VM. `CAVA_ENABLED=0` excludes Cava from
   startup, recovery, direct widget launches, and palette refreshes.
@@ -71,7 +88,9 @@ changing the configuration, then use `README.md` for installation details and
   The control center omits inactive timer and animation controls.
 - Apply these profiles only on the VM and log out/in to retire old processes.
   The physical desktop retains its defaults when `desktop.env` is absent.
-  Work VM deployment and visual verification are still pending.
+  The user has deployed the VM; the new compositor profile still needs VM
+  installation and visual verification. Its xcompmgr package must be installed
+  separately, and the dotfiles installer must link the new `picom/vm.conf`.
 - Repository checks, six music checks, seven wallpaper checks, and widget
   recovery checks pass. Isolated work-profile checks confirm Cava stays off
   while Calendar/Conky still launch, and Polybar/control-center menus omit the
@@ -276,7 +295,7 @@ Standard `Mod+1` through `Mod+0` workspace navigation and matching
 | Polybar | `home/.config/polybar/config.ini`, `launch.sh`, `scripts/` |
 | Rofi appearance | `home/.config/rofi/config.rasi` |
 | Dunst | `home/.config/dunst/dunstrc` |
-| Picom | `home/.config/picom/picom.conf`, `home/.config/i3/start-picom.sh` |
+| Compositors | `home/.config/picom/picom.conf`, `home/.config/picom/vm.conf`, `home/.config/i3/start-picom.sh` |
 | Pywal templates | `home/.config/wal/templates/` |
 | Neovim | `home/.config/nvim/`, including `lua/config/theme.lua` and `lazy-lock.json` |
 | Package inventory | `packages/cachyos.txt` |
@@ -382,9 +401,9 @@ Useful live logs:
 - There is no system tray by design; `nm-applet` is therefore disabled.
 - The work VM is operational and exposed the static-palette issue addressed in
   this pass. The application focus-outline correction was observed on the
-  primary personal rig. Picom remains disabled in the VM by default, can be
-  disabled explicitly with `~/.config/picom/disable`, and static wallpapers
-  are selected automatically when images are available.
+  primary personal rig. VMs now select the Picom XRender profile with an
+  xcompmgr fallback; `~/.config/picom/disable` still disables all compositing.
+  Static wallpapers are selected automatically when images are available.
 - Weather credentials remain local in the ignored
   `~/.config/polybar/weather.env`. Never commit that file or another API key.
 - Neovim configuration and its plugin lockfile are included in this repository.
