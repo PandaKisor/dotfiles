@@ -15,6 +15,7 @@ widget_cache="$cache_home/i3-widgets"
 log_file="$widget_state/widgets.log"
 cava_config="$widget_cache/cava.conf"
 conky_config="$config_home/conky/widget.conf"
+calendar_card="$config_home/i3/calendar-card.py"
 workspace="10:widgets"
 
 if [[ ! -d "$runtime_dir" || ! -w "$runtime_dir" ]]; then
@@ -180,7 +181,7 @@ place_conky() {
     done
     window_exists i3-widget-system || return 0
     i3-msg \
-        '[class="^i3-widget-system$"] floating enable, resize set 31 ppt 43 ppt, move position 67 ppt 4 ppt, border pixel 2' \
+        '[class="^i3-widget-system$"] floating enable, resize set 31 ppt 58 ppt, move position 67 ppt 4 ppt, border pixel 2' \
         >/dev/null 2>&1 || true
 }
 
@@ -212,12 +213,13 @@ ensure_widgets() {
         report_missing cava "$interactive"
     fi
 
-    if command -v calcurse >/dev/null 2>&1 && command -v alacritty >/dev/null 2>&1; then
+    if command -v python3 >/dev/null 2>&1 && command -v alacritty >/dev/null 2>&1 \
+        && [[ -r "$calendar_card" ]]; then
         launch_terminal_widget \
-            calendar i3-widget-calendar 'Calendar • Agenda' \
-            --command calcurse
+            calendar i3-widget-calendar 'Calendar' \
+            --command python3 "$calendar_card"
     else
-        report_missing calcurse "$interactive"
+        report_missing python3 "$interactive"
     fi
 
     if command -v conky >/dev/null 2>&1 && [[ -r "$conky_config" ]]; then

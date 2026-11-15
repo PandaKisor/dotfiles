@@ -13,6 +13,8 @@ with tempfile.TemporaryDirectory(prefix='widget-recovery-test-') as temp:
     (root / 'bin').mkdir()
     (root / 'config/conky').mkdir(parents=True)
     (root / 'config/conky/widget.conf').touch()
+    (root / 'config/i3').mkdir(parents=True)
+    (root / 'config/i3/calendar-card.py').touch()
     env = dict(os.environ, XDG_RUNTIME_DIR=temp, XDG_CONFIG_HOME=str(root / 'config'),
                XDG_STATE_HOME=str(root / 'state'), XDG_CACHE_HOME=str(root / 'cache'),
                PATH=f"{root / 'bin'}:{os.environ['PATH']}", TEST_ROOT=temp)
@@ -87,7 +89,6 @@ sleep 2
         with (root / f'i3-widget-monitor-{os.getuid()}.lock').open('r') as monitor_file:
             fcntl.flock(monitor_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
         time.sleep(2)
-    (root / 'config/i3').mkdir()
     (root / 'config/i3/desktop.env').write_text('CAVA_ENABLED=0\n')
     launches_before = (root / 'launches').read_text()
     config_before = cava_config.stat()
