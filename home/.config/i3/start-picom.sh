@@ -53,6 +53,11 @@ if pgrep -u "$UID" -x picom >/dev/null 2>&1 \
     exit 0
 fi
 
+# Keep one previous session's log. Picom can repeat the same harmless warning
+# thousands of times, so the log must not grow across logins forever.
+if [[ -f "$log_file" ]] && (( $(stat -c %s -- "$log_file" 2>/dev/null || echo 0) > 1048576 )); then
+    mv -f -- "$log_file" "$log_file.old"
+fi
 exec >> "$log_file" 2>&1
 printf 'Starting compositor mode: %s\n' "$mode"
 child_pid=''
