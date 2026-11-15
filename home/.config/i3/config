@@ -208,14 +208,22 @@ bindsym XF86AudioNext exec --no-startup-id playerctl --player=playerctld next
 bindsym XF86AudioPrev exec --no-startup-id playerctl --player=playerctld previous
 bindsym XF86AudioStop exec --no-startup-id playerctl --player=playerctld stop
 
-# Screenshot like Windows Snipping Tool
-bindsym $mod+Shift+s exec flameshot gui
+# Screenshots: snip a region (default), the focused window, or the full
+# screen. Each is copied to the clipboard and saved to ~/Pictures/Screenshots.
+# --release lets slop grab the keyboard after the key is let go.
+bindsym --release $mod+Shift+s exec --no-startup-id ~/.config/i3/screenshot.sh region
+bindsym --release Print exec --no-startup-id ~/.config/i3/screenshot.sh region
+bindsym --release Shift+Print exec --no-startup-id ~/.config/i3/screenshot.sh window
+bindsym --release Control+Print exec --no-startup-id ~/.config/i3/screenshot.sh full
+# Flameshot for snips you want to annotate (arrows, blur, text).
+bindsym $mod+Control+s exec --no-startup-id flameshot gui
 
 # Select another image or video and regenerate the desktop palette.
 bindsym $mod+Shift+n exec --no-startup-id ~/.config/i3/live-wallpaper.sh --next
 
-# Clipboard history
-bindsym $mod+Shift+v exec copyq show
+# Clipboard history in Rofi via greenclip; falls back to CopyQ if absent.
+# (Logic lives in a script: i3 splits exec lines at ";".)
+bindsym --release $mod+Shift+v exec --no-startup-id ~/.config/i3/clipboard.sh menu
 
 # Audio control panel scratchpad
 bindsym $mod+Shift+a exec --no-startup-id ~/.config/i3/scratchpad.sh audio
@@ -229,8 +237,8 @@ bindsym $mod+Shift+f exec thunar
 # System monitor
 bindsym $mod+Shift+b exec alacritty -e btop
 
-# Password manager
-bindsym $mod+Shift+k exec keepassxc
+# Password manager scratchpad: launch once, then show/hide the main window.
+bindsym $mod+Shift+k exec --no-startup-id ~/.config/i3/scratchpad.sh passwords
 
 # Palette-aware lock screen with a clock and authentication feedback.
 bindsym $mod+l exec --no-startup-id ~/.config/i3/lock-screen.sh
@@ -251,7 +259,12 @@ exec --no-startup-id sh -c 'test -x "$HOME/.config/i3/local-startup.sh" && exec 
 # Startup services using packages you already have.
 exec --no-startup-id dunst
 exec_always --no-startup-id ~/.config/i3/start-picom.sh
-exec --no-startup-id copyq --start-server
+exec --no-startup-id ~/.config/i3/clipboard.sh daemon
+# Graphical password prompts for admin actions (mounting drives, system
+# network settings); i3 does not run XDG autostart entries itself.
+exec --no-startup-id sh -c 'test -x /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 && exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1'
+# Lock when the screen blanks after 10 idle minutes and before suspend.
+exec --no-startup-id sh -c 'command -v xss-lock >/dev/null 2>&1 && exec xss-lock --transfer-sleep-lock -- "$HOME/.config/i3/idle-lock.sh"'
 exec --no-startup-id ~/.config/i3/music-player.sh --daemon
 
 # Name only workspaces that already exist; the standard bindings create any
