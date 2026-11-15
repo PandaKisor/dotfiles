@@ -127,7 +127,8 @@ changing the configuration, then use `README.md` for installation details and
   directly to Pywal. Animated mode retains the xwinwrap/MPV pipeline.
 - Selection excludes the three most recent wallpapers when enough alternatives
   exist.
-- `wallpaper-rotation.sh` changes the wallpaper every 30 minutes by default.
+- Automatic wallpaper rotation is off by default (`WALLPAPER_INTERVAL=0`)
+  because each change restarts i3; `Mod+Shift+n` changes it on demand.
 - Fullscreen application containers pause the remaining rotation countdown and
   MPV animation automatically. This includes other workspaces and outputs;
   workspace-level fullscreen flags do not count as fullscreen applications.
@@ -170,7 +171,7 @@ changing the configuration, then use `README.md` for installation details and
 Environment overrides:
 
 - `WALLPAPER_MODE` — `auto`, `image`, or `video`; VMs prefer images in `auto`.
-- `WALLPAPER_INTERVAL` — rotation seconds; `0` disables rotation.
+- `WALLPAPER_INTERVAL` — rotation seconds; `0` (the default) disables rotation.
 - `WALLPAPER_HISTORY_SIZE` — recent selections excluded; default `3`.
 - `WALLPAPER_FALLBACK_COLOR` — X root hex color; default `#000000`.
 - `IMAGE_WALLPAPER_DIR` — static JPG, PNG, and WebP directory.

@@ -89,7 +89,7 @@ actions=(
     "$notifications_action"
     "$wallpaper_action"
 )
-[[ "${WALLPAPER_INTERVAL:-${VIDEO_WALLPAPER_INTERVAL:-1800}}" == 0 ]] || actions+=("$timer_action")
+[[ "${WALLPAPER_INTERVAL:-${VIDEO_WALLPAPER_INTERVAL:-0}}" == 0 ]] || actions+=("$timer_action")
 case "${WALLPAPER_MODE:-auto}" in
     image|images|static) ;;
     *) actions+=("$animation_action") ;;

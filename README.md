@@ -324,9 +324,11 @@ so startup, player handoffs, and renderer failures never expose an unrelated
 default image. During a normal change, the old wallpaper remains visible while
 the next color palette is generated.
 
-`wallpaper-rotation.sh` selects another wallpaper every 30 minutes. Set
-`WALLPAPER_INTERVAL` in the environment before i3 starts to change the interval
-in seconds, or set it to `0` to disable automatic rotation. Set
+Automatic rotation is off by default, because every wallpaper change
+regenerates the palette and restarts i3. `Mod+Shift+n` changes the wallpaper on
+demand. To rotate automatically, set `WALLPAPER_INTERVAL` (seconds, at least
+60; for example `1800`) in `~/.config/i3/wallpaper.env` or the environment
+before i3 starts. Set
 `WALLPAPER_HISTORY_SIZE` to change the three-wallpaper history, and set
 `WALLPAPER_FALLBACK_COLOR` to another six-digit hex color if black is not
 desired. The former `VIDEO_WALLPAPER_INTERVAL`,
