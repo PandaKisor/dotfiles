@@ -203,12 +203,15 @@ rotation for a constrained VM.
   after Cava closed, blocking all subsequent recovery. Existing calendar
   windows can stay open through this migration. Cava errors now go to
   `~/.local/state/i3/widgets/cava.log` for diagnosing unexpected exits.
-- A session-owned widget monitor checks the cards every five seconds and
-  restores any missing application without changing the focused workspace.
-  Its own singleton lock is closed in launcher and sleep children, preventing
-  stale descendants from blocking recovery after logout or session restart.
-  A live close-and-recovery check replaced the Cava process within seven
-  seconds while retaining exactly one visualizer window.
+- A session-owned widget monitor subscribes to i3 window events and checks
+  the cards one second after any window closes (again two seconds later for
+  slow exits), with a 60-second safety check and a five-second polling
+  fallback when i3 IPC is unavailable. It restores any missing application
+  without changing the focused workspace. Its own singleton lock is closed in
+  launcher, sleep, and subscriber children, preventing stale descendants from
+  blocking recovery after logout or session restart. A live close-and-recovery
+  check restored Cava and Conky in about 1.2 seconds with exactly one window
+  each.
 - Conky 1.25 re-applies its own alignment position on every update while
   visible, and i3 honours that move for floating windows. `widget.conf` aims
   Conky's `top_left` gap at the i3 card slot (computed from the screen size),

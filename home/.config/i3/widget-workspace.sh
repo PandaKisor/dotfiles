@@ -265,12 +265,31 @@ monitor_widgets() {
     exec {monitor_lock_fd}>"$widget_monitor_lock"
     flock -n "$monitor_lock_fd" || exit 0
 
-    # Keep persistent cards present even after an application exits. Close the
-    # monitor lock in children so an old sleep or launcher cannot block a new
-    # monitor after logout or an i3 session restart.
+    # Keep persistent cards present even after an application exits. Rather
+    # than polling, wait for i3 to report a closed window (or 60 seconds as a
+    # safety net), then check the cards. Close the monitor lock in children so
+    # an old sleep, subscriber, or launcher cannot block a new monitor after
+    # logout or an i3 session restart.
+    local line started
+    "$0" ensure {monitor_lock_fd}>&- || true
     while :; do
+        line=''
+        started=$SECONDS
+        while IFS= read -r line; do
+            [[ "$line" == *'"change":"close"'* ]] && break
+        done < <(timeout 60 i3-msg -t subscribe -m '["window"]' 2>/dev/null {monitor_lock_fd}>&-)
+        if [[ "$line" == *'"change":"close"'* ]]; then
+            # A closed card's process (e.g. Alacritty) can outlive its window
+            # briefly and would count as still running. Check after it has had
+            # a moment to exit, then once more for slow exits.
+            sleep 1 {monitor_lock_fd}>&- || exit 0
+            "$0" ensure {monitor_lock_fd}>&- || true
+            sleep 2 {monitor_lock_fd}>&- || exit 0
+        elif (( SECONDS - started < 1 )); then
+            # No event stream (i3 IPC unavailable): fall back to polling.
+            sleep 5 {monitor_lock_fd}>&- || exit 0
+        fi
         "$0" ensure {monitor_lock_fd}>&- || true
-        sleep 5 {monitor_lock_fd}>&- || exit 0
     done
 }
 
