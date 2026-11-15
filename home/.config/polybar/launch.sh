@@ -9,7 +9,7 @@ if [[ -r "$config_home/i3/desktop.env" ]]; then
   # shellcheck source=/dev/null
   source "$config_home/i3/desktop.env"
 fi
-export POLYBAR_MODULES_RIGHT='cpu memory network volume date notifications control'
+export POLYBAR_MODULES_RIGHT='updates cpu memory network volume date notifications control'
 if [[ "${MUSIC_ENABLED:-1}" != 0 ]]; then
   POLYBAR_MODULES_RIGHT="media $POLYBAR_MODULES_RIGHT"
 fi
