@@ -6,6 +6,7 @@ config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 rofi_config="$config_home/rofi/config.rasi"
 rofi_popup="$config_home/i3/rofi-popup.sh"
 volume_script="$config_home/i3/volume-osd.sh"
+scratchpad_script="$config_home/i3/scratchpad.sh"
 menu_theme='window { width: 30%; } listview { lines: 4; }'
 sink='@DEFAULT_SINK@'
 
@@ -36,7 +37,7 @@ rows=(
     "$mute_row"
     '  Volume down 5%'
     '  Volume up 5%'
-    '  Advanced audio mixer'
+    '  Wiremix audio mixer'
 )
 
 selection="$(printf '%s\n' "${rows[@]}" | "$rofi_popup" \
@@ -50,8 +51,6 @@ case "$selection" in
     1) "$volume_script" down ;;
     2) "$volume_script" up ;;
     3)
-        if command -v pavucontrol >/dev/null 2>&1; then
-            setsid -f pavucontrol </dev/null >/dev/null 2>&1
-        fi
+        exec "$scratchpad_script" audio
         ;;
 esac

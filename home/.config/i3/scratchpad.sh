@@ -3,6 +3,7 @@
 set -u
 
 scratchpad_name="${1:-}"
+title_pattern=''
 
 notify_error() {
     local message="$1"
@@ -51,16 +52,38 @@ case "$scratchpad_name" in
         ;;
     audio)
         mark_name=scratchpad-audio
-        class_pattern='^Pavucontrol$'
-        i3_selector='[class="(?i)^Pavucontrol$"]'
-        width='760 px'
-        height='560 px'
-        required_app=pavucontrol
-        install_hint='Install Pavucontrol to use the audio scratchpad.'
-        launch_command=(pavucontrol)
+        class_pattern='^Wiremix$'
+        i3_selector='[class="(?i)^Wiremix$"]'
+        width='72 ppt'
+        height='54 ppt'
+        required_app=wiremix
+        install_hint='Install wiremix and Alacritty to use the audio scratchpad.'
+        command -v alacritty >/dev/null 2>&1 || {
+            notify_error "$install_hint"
+            exit 1
+        }
+        launch_command=(
+            alacritty
+            --class Wiremix,Wiremix
+            --title 'Wiremix'
+            -e wiremix
+        )
+        ;;
+    passwords)
+        # Match only the main window. Its title ends in "KeePassXC"; browser
+        # access and auto-type prompts start with "KeePassXC -" and stay free.
+        mark_name=scratchpad-passwords
+        class_pattern='^KeePassXC$'
+        title_pattern='(^KeePassXC$| - KeePassXC$)'
+        i3_selector='[class="^KeePassXC$" title="(^KeePassXC$| - KeePassXC$)"]'
+        width='60 ppt'
+        height='60 ppt'
+        required_app=keepassxc
+        install_hint='Install KeePassXC to use the password scratchpad.'
+        launch_command=(keepassxc)
         ;;
     *)
-        notify_error 'Usage: scratchpad.sh {terminal|calculator|audio}'
+        notify_error 'Usage: scratchpad.sh {terminal|calculator|audio|passwords}'
         exit 2
         ;;
 esac
@@ -72,17 +95,20 @@ fi
 
 tree_contains_mark() {
     i3-msg -t get_tree 2>/dev/null \
-        | jq -e --arg mark "$mark_name" \
-            '.. | objects | select((.marks? // []) | index($mark))' \
+        | jq -e --arg mark "$mark_name" --arg pattern "$class_pattern" '
+            .. | objects
+            | select((.marks? // []) | index($mark))
+            | select((.window_properties.class? // "") | test($pattern; "i"))' \
             >/dev/null
 }
 
 tree_contains_class() {
     i3-msg -t get_tree 2>/dev/null \
-        | jq -e --arg pattern "$class_pattern" '
+        | jq -e --arg pattern "$class_pattern" --arg title "$title_pattern" '
             .. | objects
             | select(.window? != null)
             | select((.window_properties.class? // "") | test($pattern; "i"))
+            | select($title == "" or ((.window_properties.title? // "") | test($title)))
         ' >/dev/null
 }
 
