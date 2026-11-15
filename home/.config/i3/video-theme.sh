@@ -82,8 +82,17 @@ esac
 # output directory so Pywal and every consumer agree even if PYWAL_CACHE_DIR is
 # set elsewhere in the environment.
 palette_source="$(readlink -f -- "$palette_source")"
+# Pywal16's --saturate ADDS to each colour's saturation (-1.0 to 1.0); it does
+# not set an absolute value. A small negative amount tones down vivid picks.
+# Override with PYWAL_SATURATE in wallpaper.env.
+if [[ -z "${PYWAL_SATURATE:-}" && -r "$config_home/i3/wallpaper.env" ]]; then
+    PYWAL_SATURATE="$(sed -n 's/^PYWAL_SATURATE=["'\'']\{0,1\}\(-\{0,1\}[0-9.]*\).*/\1/p' \
+        "$config_home/i3/wallpaper.env" | tail -n 1)"
+fi
+saturate="${PYWAL_SATURATE:--0.15}"
+[[ "$saturate" =~ ^-?(0(\.[0-9]+)?|1(\.0+)?)$ ]] || saturate=-0.15
 PYWAL_CACHE_DIR="$wal_cache" \
-    wal -n -q -e --cols16 darken --saturate 0.2 --contrast 3 -i "$palette_source"
+    wal -n -q -e --cols16 darken --saturate "$saturate" --contrast 3 -i "$palette_source"
 
 for template in "${required_templates[@]}"; do
     if [[ ! -s "$wal_cache/$template" ]]; then

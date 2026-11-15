@@ -10,8 +10,10 @@ if [[ -r "$config_home/i3/desktop.env" ]]; then
   source "$config_home/i3/desktop.env"
 fi
 export POLYBAR_MODULES_RIGHT='updates cpu memory network volume date notifications control'
-if [[ "${MUSIC_ENABLED:-1}" != 0 ]]; then
-  POLYBAR_MODULES_RIGHT="media $POLYBAR_MODULES_RIGHT"
+# The centre shows the playing track; without music it shows the window title.
+export POLYBAR_MODULES_CENTER=media
+if [[ "${MUSIC_ENABLED:-1}" == 0 ]]; then
+  POLYBAR_MODULES_CENTER=xwindow
 fi
 cache_home="${XDG_CACHE_HOME:-$HOME/.cache}"
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
