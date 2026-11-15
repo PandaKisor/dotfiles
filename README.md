@@ -45,6 +45,14 @@ destinations are ignored by Git so a work machine can use different values.
 
 ## Neovim development setup
 
+Neovim is the default editor through `EDITOR`, `VISUAL`, and `SUDO_EDITOR` in
+`.profile` and Fish. New Fish terminals pick this up immediately; log out and
+back in to update the rest of an existing desktop session. Micro remains an
+optional editor for quick changes. The MIME defaults open text, source, and
+configuration files in Neovim inside Alacritty, and common media files in mpv.
+The private `nvim-alacritty.desktop` handler launches Alacritty explicitly so
+file-manager launches do not depend on an installed `xterm` fallback.
+
 The complete Neovim configuration and its pinned Lazy plugin lockfile live
 under `home/.config/nvim/`. On first launch, Neovim bootstraps Lazy and installs
 the pinned plugins, so the work rig does not need a second configuration clone.
@@ -224,19 +232,47 @@ paused, the bell changes to a muted icon and includes the number waiting.
 ring, and colors read from the current Pywal palette. Media and brightness keys
 remain available while the session is locked.
 
+The session also locks itself. `xss-lock` runs the same lock screen when the
+display blanks after ten idle minutes and before suspend, holding suspend
+until the lock is up (`idle-lock.sh`). A lock that is already showing is never
+duplicated. The Polkit GNOME agent starts with the session so graphical admin
+prompts, such as mounting a drive in Thunar, can ask for a password.
+
+Screenshots are instant snips. `Mod+Shift+s` or `Print` selects a region,
+`Shift+Print` captures the focused window, and `Ctrl+Print` the full screen.
+Each one is copied to the clipboard, saved to `~/Pictures/Screenshots`, and
+announced with a thumbnail notification that opens the image when clicked.
+Escape or right-click cancels a selection; real failures raise a notification
+and are logged to `~/.local/state/i3/screenshot.log`. `Mod+Ctrl+s` opens
+Flameshot for snips that need arrows, blur, or text.
+
+`Mod+Shift+v` opens clipboard history in Rofi through greenclip, which starts
+with the session (`clipboard.sh`). CopyQ is the fallback when greenclip is not
+installed. Keep KeePassXC in greenclip's `blacklisted_applications` in
+`~/.config/greenclip.toml` so copied passwords are not recorded.
+
+Polybar shows a red package count when updates are waiting and hides it when
+the system is current. It checks at most hourly, rechecks right after an
+upgrade, and clicking it opens a terminal running `paru -Syu`.
+
+Install these with `sudo pacman -S --needed maim slop xclip xss-lock
+polkit-gnome` and `paru -S rofi-greenclip`.
+
 The keyboard volume and brightness keys display short, replaceable Dunst
 progress overlays. Polybar's volume module uses the same volume overlay when it
 is clicked or scrolled. Brightness control prefers `brightnessctl`, then
 XBacklight, and uses XRandR software dimming as a portable fallback for external
 monitors without a backlight interface.
 
-Three marked i3 scratchpads keep utility windows available without dedicating
+Four marked i3 scratchpads keep utility windows available without dedicating
 workspace space. `Mod+grave` toggles a large Alacritty drop-down, `Mod+C`
-toggles Qalculate GTK, and `Mod+Shift+A` toggles Pavucontrol. The first press
+toggles Qalculate GTK, `Mod+Shift+A` toggles Wiremix in Alacritty, and
+`Mod+Shift+K` toggles the KeePassXC main window (its prompts stay unmanaged). The first press
 launches and centers the utility; later presses hide or restore the same window.
 If an unmarked instance is already open, the helper adopts it instead of
-starting a duplicate. Install the calculator frontend with
-`sudo pacman -S --needed qalculate-gtk`.
+starting a duplicate. The audio menu opens the same Wiremix scratchpad.
+Install the calculator and audio tools with
+`sudo pacman -S --needed qalculate-gtk wiremix`.
 
 ## Login screen
 

@@ -18,24 +18,29 @@ ffmpeg
 i3-wm
 i3lock-color
 jq
+maim
 keepassxc
 mpv
 networkmanager
 nm-connection-editor
-pavucontrol
 pear-desktop
 picom
 playerctl
+polkit-gnome
 polybar
 pop-icon-theme
 qalculate-gtk
 rofi
+slop
 thunar
 ttf-fira-sans
 ttf-hack
 ttf-meslo-nerd
+wiremix
 xorg-xrandr
+xclip
 xorg-xsetroot
+xss-lock
 xcompmgr
 
 # Development packages used directly by the tracked Neovim configuration.
@@ -53,6 +58,7 @@ stylua
 
 # AUR packages used by the desktop (install with paru, not pacman):
 # python-pywal16-git
+# rofi-greenclip   (clipboard history; CopyQ is the fallback)
 # xwinwrap-git
 
 # Optional system login screen (separate scripts/login-screen.sh installation):

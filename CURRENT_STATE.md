@@ -1,6 +1,6 @@
 # Current desktop state and future review
 
-Last reviewed: 2026-09-18
+Last reviewed: 2026-10-04
 
 Feature checkpoint: one-stop workstation configuration with Neovim and a
 low-power static-wallpaper path for VMs
@@ -61,6 +61,27 @@ changing the configuration, then use `README.md` for installation details and
   cache, and `:WallpaperThemeReload` provides a manual refresh command.
 
 ## Implemented behavior
+
+### Application defaults
+
+- Neovim is selected by `EDITOR`, `VISUAL`, and `SUDO_EDITOR` in the login
+  profile and Fish configuration. Micro remains available for explicit use.
+- The current host also sets Git's global `core.editor` and `sequence.editor`
+  to `/usr/bin/nvim`, including commands launched from older desktop sessions.
+- Text, source, and configuration MIME types open Neovim in Alacritty via
+  `nvim-alacritty.desktop`; common audio/video files use mpv.
+- `Mod+Shift+a` and the audio menu use the same Wiremix scratchpad. The
+  Alacritty window class is `Wiremix`, including adoption of a trial window
+  launched with that class. The package list now requires `wiremix`.
+- Nano can be removed together with `nano-syntax-highlighting`. Vim is still
+  required by `cachyos-zsh-config`, which is required by
+  `cachyos-i3wm-settings`; changing the default editor does not remove that
+  package dependency.
+- Validation on 2026-10-04: all 34 deployed MIME associations resolve to their
+  intended applications, Git and new Fish/profile environments select Neovim,
+  and the live Wiremix window is floating with the `scratchpad-audio` mark.
+  Repository, shell syntax, and desktop-entry checks passed. Removal commands
+  were checked with pacman's print mode; no packages were uninstalled.
 
 ### Work VM profile
 
@@ -188,6 +209,12 @@ rotation for a constrained VM.
   stale descendants from blocking recovery after logout or session restart.
   A live close-and-recovery check replaced the Cava process within seven
   seconds while retaining exactly one visualizer window.
+- Conky 1.25 re-applies its own alignment position on every update while
+  visible, and i3 honours that move for floating windows. `widget.conf` aims
+  Conky's `top_left` gap at the i3 card slot (computed from the screen size),
+  and `widget-workspace.sh` re-applies the card geometry whenever it starts
+  Conky. A `for_window` rule in `config.d` cannot override the main config's
+  rule for the same window.
 - Cava's gradient and Conky's panel colors come directly from the active Pywal
   cache and refresh when the wallpaper changes. Calcurse inherits the same
   palette from Alacritty while keeping its personal calendar data untracked.
@@ -209,7 +236,7 @@ rotation for a constrained VM.
   Firefox, and Steam windows use the personal workspace assignments; all windows
   remain movable. The portable default remains free of personal app startup.
 - `scratchpad.sh` manages marked, reusable terminal, Qalculate GTK, and
-  Pavucontrol windows. It adopts an existing matching window, or launches and
+  Wiremix windows. It adopts an existing matching window, or launches and
   centers one on first use, then toggles the same container thereafter.
 
 ### Session controls
@@ -269,7 +296,7 @@ rotation for a constrained VM.
 | `Mod+Shift+A` | Toggle the audio mixer scratchpad |
 | `Mod+Shift+F` | Thunar |
 | `Mod+Shift+B` | Btop in Alacritty |
-| `Mod+Shift+K` | KeePassXC |
+| `Mod+Shift+K` | Show or hide the KeePassXC scratchpad |
 | `Mod+Shift+C` | Reload i3 configuration |
 | `Mod+Shift+R` | Restart i3 while preserving the window tree |
 
@@ -343,7 +370,7 @@ At this checkpoint:
   focus color. Screenshot pixel inspection confirmed the rendered border uses
   the generated teal after Picom frame opacity, not the pale static fallback.
 - The terminal scratchpad passed a live first-launch, mark, geometry, border,
-  show, and hide test. Pavucontrol passed the same live adoption and hide test,
+  show, and hide test. Before the Wiremix migration, Pavucontrol passed the same live adoption and hide test,
   and the user confirmed the Qalculate GTK scratchpad is working as intended.
 - The completed widget workspace was rendered and inspected at 2560 by 1440.
   Pear, Calcurse, and Conky align in three equal upper cards; Cava fills one
