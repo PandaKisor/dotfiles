@@ -221,7 +221,13 @@ ensure_widgets() {
     fi
 
     if command -v conky >/dev/null 2>&1 && [[ -r "$conky_config" ]]; then
-        launch_conky
+        # Conky 1.25 sizes its own window after the first update, overriding
+        # the for_window card size, so re-apply the card geometry whenever this
+        # pass had to start it. An existing card is left alone.
+        if ! window_exists i3-widget-system; then
+            launch_conky
+            place_conky
+        fi
     else
         report_missing conky "$interactive"
     fi
