@@ -194,9 +194,10 @@ rotation for a constrained VM.
   They have no permanent application assignments. `workspace-session.sh`
   offers optional game, media, and development starting arrangements while
   leaving every resulting window freely movable.
-- Pear Desktop, Calcurse, and the Conky system panel occupy responsive
-  31-by-43-percent cards across its upper half. Cava occupies a wide
-  98-by-20-percent card below them. `widget-workspace.sh` starts missing cards,
+- Pear Desktop, the calendar card, and the Conky system panel occupy
+  responsive 31-by-58-percent cards across the top. Cava occupies a wide
+  98-by-31-percent card below them. The calendar card (`calendar-card.py`)
+  replaced Calcurse, which had no appointments or to-dos stored. `widget-workspace.sh` starts missing cards,
   prevents duplicates, and restores closed cards whenever `Mod+0` is pressed.
 - Widget recovery uses `i3-widget-launch-$UID.lock`; child applications never
   inherit it. The former `i3-widgets-$UID.lock` could remain held by Calcurse
@@ -218,9 +219,15 @@ rotation for a constrained VM.
   and `widget-workspace.sh` re-applies the card geometry whenever it starts
   Conky. A `for_window` rule in `config.d` cannot override the main config's
   rule for the same window.
+- Pywal16's `--saturate` adds to each color's saturation rather than setting
+  it, so the former `--saturate 0.2` boosted every color. `video-theme.sh`
+  now uses `-0.15` to tone colors down slightly; set `PYWAL_SATURATE` in
+  `wallpaper.env` to change it.
+- Polybar's centre shows the playing track; it falls back to the window title
+  when music is disabled.
 - Cava's gradient and Conky's panel colors come directly from the active Pywal
-  cache and refresh when the wallpaper changes. Calcurse inherits the same
-  palette from Alacritty while keeping its personal calendar data untracked.
+  cache and refresh when the wallpaper changes. The calendar card rereads the
+  same palette on every redraw.
   Cava's generated config is replaced only when its contents change; rewriting
   identical contents during the five-second recovery check caused live reload
   to repeatedly reset the visualizer.
@@ -376,7 +383,7 @@ At this checkpoint:
   show, and hide test. Before the Wiremix migration, Pavucontrol passed the same live adoption and hide test,
   and the user confirmed the Qalculate GTK scratchpad is working as intended.
 - The completed widget workspace was rendered and inspected at 2560 by 1440.
-  Pear, Calcurse, and Conky align in three equal upper cards; Cava fills one
+  Pear, the calendar, and Conky align in three equal upper cards; Cava fills one
   wide lower card without obscuring the remaining wallpaper. `Mod+0` focused
   the exact named workspace and a repeat launch kept one instance of each
   managed widget. A live palette refresh replaced Conky, reloaded Cava, and

@@ -129,29 +129,31 @@ fallback, duplicate-start, and shutdown checks.
 ## Widget workspace and YouTube Music
 
 Workspace 10 is named `10:widgets` and is reserved for persistent,
-low-attention applications. Pear Desktop, Calcurse, Cava, and a compact Conky
-system panel start with the i3 session and are assigned there without pulling
+low-attention applications. Pear Desktop, a month calendar, Cava, and a compact
+Conky system panel start with the i3 session and are assigned there without pulling
 focus from the main workspace. `Mod+0` opens the widget workspace and restores
 any card that was closed; `Mod+m` opens it and focuses or launches YouTube
 Music.
 
-The workspace follows a responsive three-column grid. Pear, Calcurse, and
-Conky occupy 31-by-43-percent cards across the upper half, while Cava spans a
-98-by-20-percent row beneath them. Cava and Conky regenerate their colors from
-the active Pywal palette; Calcurse receives the same palette through
-Alacritty's live color import.
+The workspace follows a responsive three-column grid. Pear, the calendar, and
+Conky occupy 31-by-58-percent cards across the top, while Cava spans a
+98-by-31-percent row beneath them. The calendar (`calendar-card.py`, run in
+Alacritty) shows the current month with today highlighted, a smaller view of
+the next month, and the week and day of the year; it redraws on resize and
+each minute and follows the Pywal palette. Conky shows performance, session,
+hardware (CPU and GPU temperature, GPU load and memory, with the dedicated GPU
+detected at startup), and the busiest processes.
 
-Install the three widget applications with:
+Install the widget applications with:
 
 ```bash
-sudo pacman -S --needed cava calcurse conky
+sudo pacman -S --needed cava conky python
 ```
 
 Each card remains a normal application: close one when it is not useful and
 press `Mod+0` to restore it. Cava listens to the default PipeWire output and
-its arrow keys adjust sensitivity and bar density. Calcurse stores personal
-appointments in its standard XDG data directory; those files are deliberately
-not part of the dotfiles repository.
+its arrow keys adjust sensitivity and bar density. Press `q` in the calendar
+to close it.
 
 The launcher prefers [Pear Desktop](https://github.com/pear-devs/pear-desktop),
 an unofficial dedicated client, and falls back to a separate Firefox window
