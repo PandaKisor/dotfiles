@@ -12,7 +12,6 @@ home/.config/i3/wallpaper.env
 home/.config/i3/desktop.env
 home/.config/picom/disable
 home/.config/picom/enable-in-vm
-home/.config/polybar/weather.env
 
 # Generated state and backup copies
 *.bak

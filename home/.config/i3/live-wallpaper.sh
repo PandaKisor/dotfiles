@@ -25,10 +25,8 @@ theme_script="$config_home/i3/video-theme.sh"
 log_dir="$state_home/i3"
 log_file="$log_dir/live-wallpaper.log"
 history_file="$log_dir/wallpaper-history"
-legacy_history_file="$log_dir/video-history"
-legacy_last_video_file="$log_dir/last-video"
-history_size="${WALLPAPER_HISTORY_SIZE:-${VIDEO_WALLPAPER_HISTORY_SIZE:-3}}"
-fallback_color="${WALLPAPER_FALLBACK_COLOR:-${VIDEO_WALLPAPER_FALLBACK_COLOR:-#000000}}"
+history_size="${WALLPAPER_HISTORY_SIZE:-3}"
+fallback_color="${WALLPAPER_FALLBACK_COLOR:-#000000}"
 if [[ ! -d "$runtime_dir" || ! -w "$runtime_dir" ]]; then
     runtime_dir=/tmp
 fi
@@ -79,11 +77,6 @@ fi
 history=()
 if [[ -r "$history_file" ]]; then
     mapfile -t history < "$history_file"
-elif [[ -r "$legacy_history_file" ]]; then
-    mapfile -t history < "$legacy_history_file"
-elif [[ -r "$legacy_last_video_file" ]]; then
-    read -r legacy_last_video < "$legacy_last_video_file"
-    [[ -n "$legacy_last_video" ]] && history+=("$legacy_last_video")
 fi
 
 if [[ "$requested_wallpaper" == --current ]]; then

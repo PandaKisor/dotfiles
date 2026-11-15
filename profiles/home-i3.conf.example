@@ -14,3 +14,10 @@ exec --no-startup-id discord
 exec --no-startup-id firefox
 exec --no-startup-id alacritty --class Alacritty,i3-main-startup
 exec --no-startup-id steam
+
+# KeePassXC starts locked and hidden in the scratchpad; Mod+Shift+k toggles it.
+exec --no-startup-id ~/.config/i3/keepassxc-start.sh
+
+# Run the monitor above its default refresh rate (check `xrandr` for the
+# output name and supported rates).
+# exec --no-startup-id xrandr --output DisplayPort-2 --mode 2560x1440 --rate 240

@@ -34,20 +34,14 @@ for script in \
     bash -n "$script" || failed=1
 done
 
-python3 -c '
-import pathlib
-import sys
-
-path = pathlib.Path(sys.argv[1])
-compile(path.read_bytes(), str(path), "exec")
-' "$repo_root/home/.config/i3/quadrant-tiling.py" || failed=1
-
-python3 -c '
+for python_file in "$repo_root"/scripts/*.py "$repo_root"/home/.config/i3/*.py; do
+    python3 -c '
 import pathlib
 import sys
 path = pathlib.Path(sys.argv[1])
 compile(path.read_bytes(), str(path), "exec")
-' "$repo_root/scripts/login-screen-preview.py" || failed=1
+' "$python_file" || failed=1
+done
 
 if command -v luac >/dev/null 2>&1; then
     while IFS= read -r -d '' lua_file; do

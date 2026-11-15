@@ -4,10 +4,8 @@ set -u
 
 runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
-config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
 log_dir="$state_home/i3"
 log_file="$log_dir/autotiling.log"
-legacy_helper="$config_home/i3/quadrant-tiling.py"
 if [[ ! -d "$runtime_dir" || ! -w "$runtime_dir" ]]; then
     runtime_dir=/tmp
 fi
@@ -20,23 +18,6 @@ if ! command -v autotiling >/dev/null 2>&1; then
     printf 'Required command not found: autotiling\n' > "$log_file"
     exit 1
 fi
-
-# Retire any copy of the superseded helper left alive by an i3 restart. Match
-# its full configured path so unrelated Python processes cannot be affected.
-for command_line_file in /proc/[0-9]*/cmdline; do
-    [[ -r "$command_line_file" ]] || continue
-    legacy_pid="${command_line_file#/proc/}"
-    legacy_pid="${legacy_pid%/cmdline}"
-    legacy_command="$(tr '\0' ' ' 2>/dev/null < "$command_line_file")"
-    if [[ "$legacy_command" == *"$legacy_helper"* ]]; then
-        kill "$legacy_pid" 2>/dev/null || true
-        for _ in {1..20}; do
-            kill -0 "$legacy_pid" 2>/dev/null || break
-            sleep 0.1
-        done
-        printf 'Stopped legacy quadrant helper: %s\n' "$legacy_pid" >> "$log_file"
-    fi
-done
 
 # An i3 restart can leave the previous IPC client alive briefly. Stop only the
 # process recorded by this wrapper before starting exactly one replacement.

@@ -11,7 +11,7 @@ fi
 state_home="${XDG_STATE_HOME:-$HOME/.local/state}"
 runtime_dir="${XDG_RUNTIME_DIR:-/tmp}"
 # Rotation is opt-in: each change regenerates the palette and restarts i3.
-interval="${WALLPAPER_INTERVAL:-${VIDEO_WALLPAPER_INTERVAL:-0}}"
+interval="${WALLPAPER_INTERVAL:-0}"
 wallpaper_script="$config_home/i3/live-wallpaper.sh"
 source "$config_home/i3/wallpaper-controls.sh" || exit 1
 log_dir="$state_home/i3"

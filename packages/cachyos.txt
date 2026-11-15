@@ -7,7 +7,6 @@ capitaine-cursors
 cachyos-nord-gtk-theme-git
 cava
 conky
-copyq
 dunst
 fastfetch
 feh
@@ -57,7 +56,7 @@ stylua
 
 # AUR packages used by the desktop (install with paru, not pacman):
 # python-pywal16-git
-# rofi-greenclip   (clipboard history; CopyQ is the fallback)
+# rofi-greenclip
 # xwinwrap-git
 
 # Optional system login screen (separate scripts/login-screen.sh installation):

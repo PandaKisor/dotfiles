@@ -171,7 +171,6 @@ for_window [class="(?i)zenity"] floating enable
 for_window [class="(?i)^Rofi$"] floating enable, move position center, border pixel 2
 for_window [class="(?i)cachyos-welcome"] floating enable
 for_window [class="(?i)firefox"] floating disable
-for_window [class="(?i)^copyq$"] floating enable, resize set 420 360, move position center, border pixel 2
 # Widget workspace geometry uses a responsive three-column grid. The three
 # upper cards occupy 31-by-58 percent each; Cava spans the lower row (31 ppt).
 for_window [class="^com[.]github[.]th-ch[.]youtube-music$"] floating enable, resize set 31 ppt 58 ppt, move position 1 ppt 4 ppt, border pixel 2
@@ -221,7 +220,7 @@ bindsym $mod+Control+s exec --no-startup-id flameshot gui
 # Select another image or video and regenerate the desktop palette.
 bindsym $mod+Shift+n exec --no-startup-id ~/.config/i3/live-wallpaper.sh --next
 
-# Clipboard history in Rofi via greenclip; falls back to CopyQ if absent.
+# Clipboard history in Rofi via greenclip.
 # (Logic lives in a script: i3 splits exec lines at ";".)
 bindsym --release $mod+Shift+v exec --no-startup-id ~/.config/i3/clipboard.sh menu
 
@@ -247,8 +246,7 @@ bindsym $mod+l exec --no-startup-id ~/.config/i3/lock-screen.sh
 # Autoload
 ########################################################################
 
-# Standard automatic split selection. Do not run this together with the old
-# quadrant-tiling.py helper; both react to the same i3 window events.
+# Automatic split direction for new windows.
 exec_always --no-startup-id ~/.config/i3/start-autotiling.sh
 
 # Monitor layout and machine-local wallpaper commands belong in this untracked
