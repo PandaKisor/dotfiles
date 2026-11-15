@@ -1,5 +1,10 @@
 #source /usr/share/cachyos-fish-config/cachyos-config.fish
 
+# Override an older desktop session's editor when opening a new terminal.
+set -gx EDITOR /usr/bin/nvim
+set -gx VISUAL /usr/bin/nvim
+set -gx SUDO_EDITOR /usr/bin/nvim
+
 
 function fish_greeting
 end
@@ -22,3 +27,4 @@ end
 #function fish_greeting
 #    # smth smth
 #end
+export PATH="$HOME/.local/bin:$PATH"

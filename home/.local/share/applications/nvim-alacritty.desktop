@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Neovim (Alacritty)
+Comment=Edit text and source files in Neovim
+TryExec=nvim
+Exec=alacritty --class Neovim,Neovim --title Neovim -e nvim -- %F
+Icon=nvim
+Terminal=false
+NoDisplay=true
+Categories=Utility;TextEditor;
+MimeType=text/plain;text/markdown;text/x-python;application/json;application/yaml;application/x-yaml;text/x-yaml;application/toml;text/x-toml;application/x-shellscript;text/x-shellscript;text/x-csrc;text/x-chdr;text/x-c++src;text/x-c++hdr;text/x-java;text/x-lua;text/x-makefile;application/javascript;text/javascript;application/xml;text/xml;text/x-patch;text/x-diff;
