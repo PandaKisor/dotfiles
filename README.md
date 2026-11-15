@@ -1,472 +1,131 @@
-# Portable dotfiles
+# dotfiles
 
-This repository stages reviewed configuration before it is linked into the
-home directory or pushed to GitHub. Files under `home/` mirror paths beneath
-`$HOME`.
+An i3 desktop for CachyOS: Polybar, Picom, Rofi, Dunst, Alacritty, Fish,
+Neovim, and a Pywal palette taken from the wallpaper (video or image) that
+recolours everything when the wallpaper changes.
 
-The repository is a one-stop workstation setup. It includes the i3 desktop,
-Picom, Polybar, Alacritty, Dunst, Rofi, GTK 2/3/4 theming, session defaults,
-Fish, and the complete Neovim configuration. See `docs/review-notes.md` for
-exclusions and portability decisions.
+Files under `home/` mirror `$HOME`. They are installed as symlinks, so edits
+in the repo take effect immediately.
 
-Future desktop work should begin with [`CURRENT_STATE.md`](CURRENT_STATE.md),
-which records the implemented behavior, live validation baseline, known
-boundaries, and remaining optional polish.
-
-## Review the current machine
+## Install
 
 ```bash
-./scripts/manage.sh status
-./scripts/check.sh
+./scripts/check.sh            # syntax, secrets, and i3 config validation
+./scripts/manage.sh status    # what is linked, identical, different, missing
+./scripts/manage.sh install   # link everything; replaced files are backed up
 ```
 
-`status` never changes files. It reports whether each tracked file is already
-linked, has identical content, differs, or is missing.
+Backups go to `~/.local/state/dotfiles/backups/<timestamp>/`. Packages are a
+separate, deliberate step: `packages/cachyos.txt` lists them (repo packages
+first, AUR packages in comments at the end).
 
-## Install the reviewed files
+Then copy the personal profile and log out and back in:
 
 ```bash
-./scripts/manage.sh install
+cp profiles/home-i3.conf.example ~/.config/i3/config.d/90-local.conf
 ```
 
-Installation creates per-file symbolic links. Existing targets are moved to a
-timestamped backup under `~/.local/state/dotfiles/backups/`; they are not
-deleted. Run the status and check commands first and inspect the diff before
-installing.
+## Keys
 
-Personal startup behavior is opt-in. Copy `profiles/home-i3.conf.example` to
-`~/.config/i3/config.d/90-local.conf` for the personal login layout: Discord and
-Firefox on `2:media`, Steam and a dedicated Alacritty terminal on `1:main`.
-These applications start once per login; wallpaper-driven i3 restarts do not
-launch them again. The terminal rule matches only the login terminal, so later
-terminals can open on the current workspace. Copy `profiles/local-startup.sh.example` to
-`~/.config/i3/local-startup.sh` for physical display commands. Both
-destinations are ignored by Git so a work machine can use different values.
-
-## Neovim development setup
-
-Neovim is the default editor through `EDITOR`, `VISUAL`, and `SUDO_EDITOR` in
-`.profile` and Fish. New Fish terminals pick this up immediately; log out and
-back in to update the rest of an existing desktop session. Micro remains an
-optional editor for quick changes. The MIME defaults open text, source, and
-configuration files in Neovim inside Alacritty, and common media files in mpv.
-The private `nvim-alacritty.desktop` handler launches Alacritty explicitly so
-file-manager launches do not depend on an installed `xterm` fallback.
-
-The complete Neovim configuration and its pinned Lazy plugin lockfile live
-under `home/.config/nvim/`. On first launch, Neovim bootstraps Lazy and installs
-the pinned plugins, so the work rig does not need a second configuration clone.
-
-The configuration requires Neovim 0.11 or newer for `vim.lsp.config()` and
-`vim.lsp.enable()`. Ripgrep and fd support Telescope search, jdtls supplies the
-Java language server, and Stylua and Prettier provide the configured formatters.
-The required package names are listed in `packages/cachyos.txt`.
-
-Neovim and Lualine read the active wallpaper palette from
-`~/.cache/wal/colors.json`. The local theme derives higher-contrast UI surfaces,
-syntax groups, diagnostics, Treesitter/LSP groups, Telescope, NvimTree, and Git
-sign colors from that palette. It checks the cache every 1.5 seconds, so an
-already-open editor follows the next wallpaper without restarting. If the cache
-is absent or malformed, the pinned Nord theme remains the fallback. Run
-`:WallpaperThemeReload` to request a manual reload and see which path was used.
-
-Only configuration is portable. Lazy's downloaded plugins, Treesitter parsers,
-undo files, caches, and other generated Neovim state remain outside this
-repository. The old nested `.git` directory from the former standalone Neovim
-repository must not be copied to the work rig.
-
-## Visual design
-
-The desktop uses a restrained glass style: ten-pixel tiled gaps, rounded Picom
-corners and shadows, a floating Polybar, and a shared Meslo Nerd Font. GTK apps
-use the CachyOS Nord theme, Pop icons, Capitaine cursors, and Fira Sans. The GTK
-and Qt theme bridge in `.profile` takes effect at the next login; newly opened
-GTK applications pick up their settings immediately.
-
-Polybar keeps workspace labels compact and shows a palette-colored circle for
-the focused or urgent workspace. Every label state has the same outer padding,
-so adding the circle does not collapse the space between workspace numbers.
-
-The shared compositor launcher keeps the existing Picom configuration on
-physical hosts. On a VM it selects `home/.config/picom/vm.conf`: Picom's XRender
-backend, 12-pixel rounded corners, soft shadows, and opacity, with OpenGL, blur,
-animations, and VSync disabled. If Picom is missing or exits with an error, it
-tries xcompmgr once. Xcompmgr preserves shadows and application-provided
-transparency (including Alacritty), but **cannot round corners or apply Picom's
-per-application and inactive-window opacity rules**. A running compositor that
-renders incorrectly must be switched manually; the launcher cannot detect
-graphical corruption. See the [Picom](https://picom.app/) and
-[xcompmgr](https://man.archlinux.org/man/xcompmgr.1.en) documentation.
-
-Install the primary and fallback compositors on an Arch VM with:
-
-```bash
-sudo pacman -S --needed picom xcompmgr
-```
-
-Set `COMPOSITOR_MODE` in the ignored `~/.config/i3/desktop.env` to select:
-
-| Value | Behavior |
+| Key | Action |
 | --- | --- |
-| `auto` (default) | Physical host: Picom; VM: XRender profile with xcompmgr fallback |
-| `vm` | XRender profile with xcompmgr fallback, regardless of VM detection |
-| `picom` | Original physical-host Picom profile |
-| `xcompmgr` | Direct fallback, with square corners and application-provided opacity |
-| `off` | No compositor |
+| `Mod+Return` | Terminal |
+| `Ctrl+Space` | App launcher |
+| `Mod+p` | Control center (also the Polybar gear) |
+| `Mod+n` | Notification center (also the Polybar bell) |
+| `Mod+q` | Close window |
+| `Mod+Arrows` / `Mod+Shift+Arrows` | Focus / move |
+| `Mod+1..9` / `Mod+Shift+1..9` | Workspace / move window there |
+| `Mod+0` | Widgets workspace (restores closed cards) |
+| `Mod+Ctrl+1/2/3` | Start the game / media / dev arrangement |
+| `Mod+h` `Mod+v` `Mod+t` | Split horizontal / vertical / toggle |
+| `Mod+f` | Fullscreen |
+| `Mod+s` `Mod+w` `Mod+e` | Stacked / tabbed / split layout |
+| `Mod+Shift+Space` / `Mod+Space` | Float / switch focus between floating and tiled |
+| `Mod+Shift+w` | Sticky |
+| `Mod+r` | Resize mode |
+| `` Mod+` `` | Drop-down terminal |
+| `Mod+c` | Calculator |
+| `Mod+Shift+a` | Audio mixer (Wiremix) |
+| `Mod+Shift+k` | KeePassXC |
+| `Mod+Shift+v` | Clipboard history |
+| `Mod+Shift+s` or `Print` | Snip a region |
+| `Shift+Print` / `Ctrl+Print` | Screenshot window / full screen |
+| `Mod+Ctrl+s` | Flameshot (annotate) |
+| `Mod+m` | Music (Pear, on the widgets workspace) |
+| `Mod+Shift+f` / `Mod+Shift+b` | Thunar / btop |
+| `Mod+Shift+n` | Next wallpaper |
+| `Mod+l` | Lock |
+| `Mod+Shift+c` / `Mod+Shift+r` / `Mod+Shift+e` | Reload / restart / exit i3 |
 
-Log out and back in after changing the mode; the launcher leaves already
-running compositors alone. It prevents duplicate launches across i3 restarts
-and logs selection and failures to `~/.local/state/i3/picom.log`.
-`touch ~/.config/picom/disable` remains an unconditional startup opt-out for
-both compositors. Remove that marker to enable compositing again. The legacy
-`enable-in-vm` marker retains the physical Picom profile in `auto` mode; an
-explicit `COMPOSITOR_MODE` takes precedence over it. Package installation is
-separate from `scripts/manage.sh install`, which links both profiles.
+Scratchpads (drop-down terminal, calculator, mixer, KeePassXC) launch on the
+first press and show/hide the same window after that.
 
-Run `python3 scripts/test-compositor-startup.py` for isolated selection,
-fallback, duplicate-start, and shutdown checks.
+## What's where
 
-## Widget workspace and YouTube Music
+**Wallpaper and colours.** Put MP4s in `~/.config/i3/wallpapers/videos/` and
+images in `~/.config/i3/wallpapers/images/` (not tracked). `live-wallpaper.sh`
+plays video through xwinwrap + mpv (images through feh) and pauses the video
+while anything is fullscreen. `video-theme.sh` runs Pywal16 on a frame, then
+reloads i3, Polybar, Rofi, Dunst, the widgets, and open Neovim sessions.
+Rotation is off by default because each change restarts i3; `Mod+Shift+n`
+changes it on demand.
 
-Workspace 10 is named `10:widgets` and is reserved for persistent,
-low-attention applications. Pear Desktop, a month calendar, Cava, and a compact
-Conky system panel start with the i3 session and are assigned there without pulling
-focus from the main workspace. `Mod+0` opens the widget workspace and restores
-any card that was closed; `Mod+m` opens it and focuses or launches YouTube
-Music.
+**Widgets workspace** (`10:widgets`). Pear (YouTube Music), a month calendar
+(`calendar-card.py`), Conky (system, hardware, top processes), and Cava. A
+monitor restores any card that closes. Geometry is in the i3 config's
+`for_window` rules.
 
-The workspace follows a responsive three-column grid. Pear, the calendar, and
-Conky occupy 31-by-58-percent cards across the top, while Cava spans a
-98-by-31-percent row beneath them. The calendar (`calendar-card.py`, run in
-Alacritty) shows the current month with today highlighted, a smaller view of
-the next month, and the week and day of the year; it redraws on resize and
-each minute and follows the Pywal palette. Conky shows performance, session,
-hardware (CPU and GPU temperature, GPU load and memory, with the dedicated GPU
-detected at startup), and the busiest processes.
+**Polybar.** Workspaces, the playing track (click to play/pause, middle/right
+for previous/next), a red count of pending updates (click to upgrade), CPU,
+memory, network, volume, date, notifications, and the control-center gear.
 
-Install the widget applications with:
+**Session.** The screen locks after 10 idle minutes and before suspend
+(`xss-lock` + `idle-lock.sh`). The Polkit agent handles admin prompts.
+greenclip records clipboard history; keep KeePassXC in
+`blacklisted_applications` in `~/.config/greenclip.toml`.
 
-```bash
-sudo pacman -S --needed cava conky python
-```
+**Neovim.** Full config with a pinned Lazy lockfile; plugins install on first
+launch (needs Neovim 0.11+). The theme follows the Pywal palette.
 
-Each card remains a normal application: close one when it is not useful and
-press `Mod+0` to restore it. Cava listens to the default PipeWire output and
-its arrow keys adjust sensitivity and bar density. Press `q` in the calendar
-to close it.
+**Login screen** (optional, system-wide). `./scripts/login-screen.sh check`,
+then `sudo ./scripts/login-screen.sh install`. See
+[`docs/login-screen.md`](docs/login-screen.md).
 
-The launcher prefers [Pear Desktop](https://github.com/pear-devs/pear-desktop),
-an unofficial dedicated client, and falls back to a separate Firefox window
-when Pear is not installed. Install the signed CachyOS package with:
+## Machine-local files (ignored by Git)
 
-```bash
-sudo pacman -S --needed pear-desktop
-```
+| File | Purpose | Example |
+| --- | --- | --- |
+| `~/.config/i3/config.d/90-local.conf` | Login apps, workspace assignments, refresh rate | `profiles/home-i3.conf.example` |
+| `~/.config/i3/local-startup.sh` | Display commands run at login | `profiles/local-startup.sh.example` |
+| `~/.config/i3/wallpaper.env` | `WALLPAPER_MODE`, `WALLPAPER_INTERVAL`, `PYWAL_SATURATE` (default `-0.15`) | `profiles/work-vm-wallpaper.env.example` |
+| `~/.config/i3/desktop.env` | `CAVA_ENABLED`, `MUSIC_ENABLED`, `COMPOSITOR_MODE` | `profiles/work-vm-desktop.env.example` |
+| `~/.config/greenclip.toml` | Clipboard history settings | — |
 
-At login, the music launcher waits five seconds, then waits up to another
-30 seconds for the default audio output to appear. An idle/suspended output
-counts as ready. If audio is still unavailable, it starts the player and logs
-the timeout in `~/.local/state/i3/music-player.log`. It does not change the
-focused workspace or duplicate a player opened during the wait. `Mod+M` remains
-immediate, and the Firefox fallback is only used for an explicit music request.
+`COMPOSITOR_MODE` is `auto` (Picom on hardware, a lighter XRender profile in a
+VM), `picom`, `vm`, `xcompmgr`, or `off`. `touch ~/.config/picom/disable` turns
+compositing off entirely.
 
-In Pear, enable the Shortcuts plugin's MPRIS integration, but leave its
-media-key override disabled because i3 handles those keys through Playerctl.
-
-Polybar shows the active track when an MPRIS player is available. Left-click
-the track to play or pause, middle-click for the previous track, right-click for
-the next track, and scroll over it to change player volume. The keyboard's
-play/pause, previous, next, and stop keys follow the most recently active media
-player, including Firefox when Pear is not running.
-
-Future widget-style applications can join the same workspace with another i3
-`assign` rule keyed to their X11 window class and a `for_window` rule selecting
-its grid position and row span.
-
-## Flexible workspace sessions
-
-The first three workspaces have light-purpose names without permanent
-application routing: `1:main`, `2:media`, and `3:dev`. Ordinary `Mod+number`
-navigation and `Mod+Shift+number` moves still work normally, so these names are
-guides rather than restrictions.
-
-Three optional launch actions prepare the common starting arrangement:
-
-- `Mod+Ctrl+1` opens `1:main` and asks whether to start Steam or Heroic.
-- `Mod+Ctrl+2` opens `2:media`, starts Discord if it is not already open, and
-  ensures a separate Firefox window is present there.
-- `Mod+Ctrl+3` opens `3:dev` and ensures it contains an Alacritty terminal.
-
-The media action never moves an existing Discord window from another
-workspace. The development terminal starts in `~/dev` when that directory
-exists; set `DEV_WORKSPACE_DIR` to choose another default. After launch, every
-window remains freely movable.
-
-## Session polish
-
-`Mod+p` opens a Pywal-colored Rofi control center; the gear at the right edge
-of Polybar opens the same menu. It provides lock, audio, network, Bluetooth,
-notification, wallpaper, desktop refresh, session, and power controls. Logout,
-suspend, reboot, and shutdown require a second confirmation. Audio opens a
-compact menu for mute, volume changes, and the advanced mixer. Network uses a
-native Wi-Fi menu for radio control, scans, connection, disconnection, hidden
-networks, and a private password prompt. Either mouse button on Polybar's
-network readout opens it; right-clicking the volume readout opens Audio.
-Bluetooth has a matching menu for power, discovery, pairing, trust, connection,
-disconnection, and confirmed device removal. Devices that require an
-interactive passkey exchange fall back to `bluetoothctl` in Alacritty.
-
-Every custom Rofi pop-out is a managed floating window rather than an exclusive
-keyboard grab. While one is open, i3 temporarily handles `Escape` (or
-`Ctrl+G`) as an unconditional dismiss action and returns to its normal binding
-mode. Menus are single-shot, so canceling a nested prompt never reopens its
-parent, and simultaneous instances are refused.
-
-`Mod+n`, the Polybar bell, or the Notifications row in the control center opens
-a Rofi notification center. It lists recent app notifications, restores a
-selected item, restores the newest item, closes visible notifications, clears
-history with confirmation, and toggles Do Not Disturb. Volume and brightness
-OSDs are filtered from this history. Middle-click the Polybar bell to toggle Do
-Not Disturb directly; right-click it to close visible notifications. While
-paused, the bell changes to a muted icon and includes the number waiting.
-
-`Mod+l` opens a blurred lock screen with a centered clock, date, authentication
-ring, and colors read from the current Pywal palette. Media and brightness keys
-remain available while the session is locked.
-
-The session also locks itself. `xss-lock` runs the same lock screen when the
-display blanks after ten idle minutes and before suspend, holding suspend
-until the lock is up (`idle-lock.sh`). A lock that is already showing is never
-duplicated. The Polkit GNOME agent starts with the session so graphical admin
-prompts, such as mounting a drive in Thunar, can ask for a password.
-
-Screenshots are instant snips. `Mod+Shift+s` or `Print` selects a region,
-`Shift+Print` captures the focused window, and `Ctrl+Print` the full screen.
-Each one is copied to the clipboard, saved to `~/Pictures/Screenshots`, and
-announced with a thumbnail notification that opens the image when clicked.
-Escape or right-click cancels a selection; real failures raise a notification
-and are logged to `~/.local/state/i3/screenshot.log`. `Mod+Ctrl+s` opens
-Flameshot for snips that need arrows, blur, or text.
-
-`Mod+Shift+v` opens clipboard history in Rofi through greenclip, which starts
-with the session (`clipboard.sh`). CopyQ is the fallback when greenclip is not
-installed. Keep KeePassXC in greenclip's `blacklisted_applications` in
-`~/.config/greenclip.toml` so copied passwords are not recorded.
-
-Polybar shows a red package count when updates are waiting and hides it when
-the system is current. It checks at most hourly, rechecks right after an
-upgrade, and clicking it opens a terminal running `paru -Syu`.
-
-Install these with `sudo pacman -S --needed maim slop xclip xss-lock
-polkit-gnome` and `paru -S rofi-greenclip`.
-
-The keyboard volume and brightness keys display short, replaceable Dunst
-progress overlays. Polybar's volume module uses the same volume overlay when it
-is clicked or scrolled. Brightness control prefers `brightnessctl`, then
-XBacklight, and uses XRandR software dimming as a portable fallback for external
-monitors without a backlight interface.
-
-Four marked i3 scratchpads keep utility windows available without dedicating
-workspace space. `Mod+grave` toggles a large Alacritty drop-down, `Mod+C`
-toggles Qalculate GTK, `Mod+Shift+A` toggles Wiremix in Alacritty, and
-`Mod+Shift+K` toggles the KeePassXC main window (its prompts stay unmanaged). The first press
-launches and centers the utility; later presses hide or restore the same window.
-If an unmarked instance is already open, the helper adopts it instead of
-starting a duplicate. The audio menu opens the same Wiremix scratchpad.
-Install the calculator and audio tools with
-`sudo pacman -S --needed qalculate-gtk wiremix`.
-
-## Login screen
-
-LightDM's Slick Greeter has a separate system-wide appearance under
-`system/lightdm/`: centered login, a static dark Nord mountain background,
-Fira Sans, Pop icons, and Capitaine cursors. The clock, keyboard layout,
-accessibility, session chooser, and power controls remain available. It uses
-system-readable assets and does not need a home directory or Pywal cache.
-
-This is an explicit system installation, separate from `manage.sh install`:
+## Work VM
 
 ```bash
-./scripts/login-screen.sh check
-sudo ./scripts/login-screen.sh install
-```
-
-The installer requires an already active `lightdm-slick-greeter`, the desktop
-theme packages, and `python-gobject`. It backs up both affected paths under
-`/var/lib/dotfiles/login-screen-backups/` and prints the exact restore command.
-The new appearance is used when the next greeter starts; the installer does
-not restart LightDM or interrupt the desktop. See
-[`docs/login-screen.md`](docs/login-screen.md) for preview and recovery steps.
-
-## Auto-tiling and wallpaper colors
-
-The i3 config runs the CachyOS/Arch `autotiling` package directly. The old
-`quadrant-tiling.py` remains for reference but is not started; never run both
-helpers together.
-
-Put JPG, PNG, or WebP files in `~/.config/i3/wallpapers/images/`, and put MP4
-files in `~/.config/i3/wallpapers/videos/`. Both directories are created
-automatically and excluded from Git. At i3 startup, `live-wallpaper.sh` chooses
-a static image when it detects a VM and otherwise prefers an MP4. If the
-preferred directory is empty, automatic mode falls back to the available type.
-Set `WALLPAPER_MODE=image` or `WALLPAPER_MODE=video` before i3 starts to force a
-type. These settings may also be placed in the ignored machine-local
-`~/.config/i3/wallpaper.env` file. Static mode uses feh and does not start
-xwinwrap or MPV.
-
-Press `Mod+Shift+N` to select another wallpaper and apply its colors through a
-preserving i3 restart, or run `~/.config/i3/live-wallpaper.sh example.png` to
-choose one by name. The selector avoids the three most recent choices when
-enough alternatives exist.
-
-For animated wallpapers, the X root underneath the animation is solid black,
-so startup, player handoffs, and renderer failures never expose an unrelated
-default image. During a normal change, the old wallpaper remains visible while
-the next color palette is generated.
-
-Automatic rotation is off by default, because every wallpaper change
-regenerates the palette and restarts i3. `Mod+Shift+n` changes the wallpaper on
-demand. To rotate automatically, set `WALLPAPER_INTERVAL` (seconds, at least
-60; for example `1800`) in `~/.config/i3/wallpaper.env` or the environment
-before i3 starts. Set
-`WALLPAPER_HISTORY_SIZE` to change the three-wallpaper history, and set
-`WALLPAPER_FALLBACK_COLOR` to another six-digit hex color if black is not
-desired. The former `VIDEO_WALLPAPER_INTERVAL`,
-`VIDEO_WALLPAPER_HISTORY_SIZE`, and `VIDEO_WALLPAPER_FALLBACK_COLOR` names
-remain compatible.
-
-Fullscreen applications automatically pause both the countdown and animated
-wallpaper playback, including games left fullscreen on another workspace or
-monitor. Exiting fullscreen resumes the remaining countdown and animation.
-The fullscreen check also runs after palette generation, before i3 restarts,
-so launching a game during an update defers that update until fullscreen ends.
-If i3 cannot be queried, wallpaper changes wait until it is available again.
-
-The control center (`Mod+P` or the Polybar gear) includes **Pause wallpaper
-timer** and **Pause animation (still frame)**. Each becomes a Resume action
-while paused. The timer control keeps the current wallpaper until resumed;
-**Next wallpaper** remains available for manual changes. Animation pause holds
-the current MP4 frame in MPV without decoding further frames or recoloring the
-desktop. It applies to subsequent MP4 selections too. These two preferences
-are independent and persist across logins in `~/.local/state/i3/`. A manual
-animation pause remains in force when a fullscreen application closes.
-Setting the rotation interval to `0` still allows automatic fullscreen
-animation pausing; it only disables scheduled wallpaper changes.
-
-Run `python3 scripts/test-wallpaper-controls.py` for the isolated fullscreen,
-timer, and renderer regression checks.
-
-Each selection asks `video-theme.sh` to run Pywal16 without replacing the
-wallpaper. Static images are analyzed directly. For an MP4, it extracts and
-scales a frame 35 percent into the video. Generated colors are consumed by i3,
-Polybar, Rofi, Dunst, Neovim, and Fish/Alacritty terminals. Open Neovim sessions
-watch the cache and refresh automatically. The Pywal output path is pinned to
-`~/.cache/wal`, and the required generated templates and source image are
-verified before the desktop reloads. The wallpaper log records the actual
-generated i3 colors; a desktop notification points to that log if generation
-fails. Override the automatic video frame time with `PYWAL_VIDEO_SEEK`, for
-example `PYWAL_VIDEO_SEEK=00:00:30`.
-
-The focused window has a two-pixel outline derived from a lightened palette
-accent. Both i3 border fields use it. A global application rule covers newly
-opened windows, while an i3-restart hook normalizes already-open windows such
-as Steam and Discord that can retain a borderless state. Focus therefore stays
-visible with either static or animated wallpapers. The generated i3 include
-defines and consumes its own `$pywal_focus` variable because i3 parent configs
-cannot consume variables defined inside an included file.
-
-Install the two components on CachyOS with:
-
-```bash
-sudo pacman -S --needed autotiling
-paru -S --needed python-pywal16-git
-```
-
-Install dependencies on CachyOS with the reviewed package names in
-`packages/cachyos.txt`. Package installation is intentionally not automatic.
-
-## Work VM quick start
-
-The public repository can be installed without signing into GitHub:
-
-```bash
-git clone https://github.com/PandaKisor/dotfiles.git
-cd dotfiles
-./scripts/check.sh
-./scripts/manage.sh install
+git clone https://github.com/PandaKisor/dotfiles.git && cd dotfiles
+./scripts/check.sh && ./scripts/manage.sh install
 mkdir -p ~/.config/i3/wallpapers/images
 cp profiles/work-vm-wallpaper.env.example ~/.config/i3/wallpaper.env
 cp profiles/work-vm-desktop.env.example ~/.config/i3/desktop.env
 ```
 
-Copy one or more JPG, PNG, or WebP wallpapers into the new image directory,
-then log out and back in. The copied work-VM profile forces static mode and
-disables automatic rotation; use `Mod+Shift+N` when you want another image.
-The desktop profile disables Cava, the dedicated music launcher (including
-`Mod+M`), Playerctld startup, and Polybar's media module. Calendar and system
-widgets remain available on `Mod+0`. Disabled Cava is excluded from recovery
-and palette refreshes. With static mode and rotation disabled, the wallpaper
-monitor exits and the control center hides timer and animation controls.
-Both profile files are machine-local and ignored by Git. Log out and back in
-after applying them to retire any music, Cava, or timer processes from the old
-session. Apply these copies on the work VM only; omit `desktop.env` or set its
-switches to `1` to retain the personal desktop behavior.
-Without that profile, a detected VM still prefers static images automatically. Run
-`touch ~/.config/picom/disable` if Picom needs to be suppressed explicitly;
-this also suppresses the backup compositor at the next login. The desktop
-profile sets `COMPOSITOR_MODE=vm`; existing profiles without this setting use
-automatic detection. Install `picom` and `xcompmgr`, rerun the dotfiles installer
-to link the new `vm.conf`, and remove any old `disable` marker if you want
-compositing enabled. Start Neovim once while online so Lazy can download its
-pinned plugins.
+Add an image or two, log out and back in, and start Neovim once while online.
+This profile uses static wallpapers, no music or Cava, and the XRender
+compositor. Skip `cava`, `pear-desktop`, `mpv`, `ffmpeg`, and `xwinwrap-git`
+when installing packages. To update later: `git pull --ff-only`, then
+`./scripts/check.sh && ./scripts/manage.sh install`.
 
-For later updates, pull the public repository and rerun the installer. Existing
-links consume changed files immediately; rerunning the installer adds links for
-any newly tracked files:
+## Troubleshooting
 
-```bash
-cd ~/dotfiles
-git pull --ff-only
-./scripts/check.sh
-./scripts/manage.sh install
-```
+Logs live in `~/.local/state/i3/`: `live-wallpaper.log`, `picom.log`,
+`screenshot.log`, `music-player.log`, `autotiling.log`, and `widgets/`.
+Polybar logs are in `~/.local/state/polybar/`.
 
-Package installation remains a separate, deliberate step. CachyOS users can
-review `packages/cachyos.txt`; on another distribution, install the equivalent
-packages with its package manager before installing the links.
-For this work profile, omit `cava`, `pear-desktop`, `playerctl`, `mpv`,
-`ffmpeg`, and the optional `xwinwrap-git`; static wallpaper still uses `feh`
-and Pywal16. These packages may remain installed if other applications use them.
-
-If wallpaper selection appears stuck, run these inside the VM's i3 terminal:
-
-```bash
-command -v jq feh i3-msg
-i3-msg -t get_tree | jq -r .type
-tail -n 40 ~/.local/state/i3/live-wallpaper.log
-```
-
-The tree command should print `root`. `jq` is required for fullscreen detection,
-including static wallpaper. Older selectors waited indefinitely when it was
-missing and held the selection lock; installing it allows that wait to resume.
-On Arch, `sudo pacman -S --needed jq feh` supplies the parser and static renderer.
-Close fullscreen applications before retrying. A concurrent-selection message
-means another process holds the lock; removing the lock file does not stop that
-process. Current selectors report missing desktop tools and preserve the active
-selection's log when another invocation encounters its lock.
-
-Starting i3 using `startx` is separate from wallpaper selection. These dotfiles
-do not install or enable a display manager; the optional login-screen installer
-only styles an already configured LightDM Slick Greeter.
-
-## Publishing updates
-
-The canonical remote is `git@github.com:PandaKisor/dotfiles.git`. Before
-publishing an update:
-
-1. Run `./scripts/check.sh`.
-2. Review `git diff` and `git status --ignored`.
-3. Rotate the old weather API key and use the ignored `weather.env` file.
-4. Confirm your workplace permits each configuration and script.
-
-No GitHub remote is configured by this repository.
+Tests: `python3 scripts/test-*.py` (each runs in an isolated temp directory).
